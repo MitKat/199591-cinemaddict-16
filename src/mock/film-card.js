@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { getRandomFloatNumber, getRandomInteger, shuffle } from '../utils';
+import {generateComment} from './comment';
 const FLOAT_POINT_RATING = 1;
 const MIN_RATING = 0.1;
 const MAX_RATING = 9.9;
@@ -8,7 +9,6 @@ const MAX_AGE_RATING = 19;
 const MAX_RUN_TIME_MINUTE = 240;
 const MIN_YEAR = 1940;
 const MAX_YEAR = 2022;
-const MAX_COMMENTS = 50;
 
 const titles = [
   'The Man with the Golden Arm',
@@ -45,7 +45,7 @@ const images = [
   './images/posters/the-great-flamarion.jpg',
   './images/posters/the-man-with-the-golden-arm.jpg',
 ];
-const peoples = [
+const people = [
   'Anne Wigton',
   'Heinz Herald',
   'Richard Weil',
@@ -67,17 +67,17 @@ const countries = [
   'China',
 ];
 const descriptions = [
-  'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-  'Cras aliquet varius magna, non porta ligula feugiat eget.',
-  'Fusce tristique felis at fermentum pharetra.',
-  'Aliquam id orci ut lectus varius viverra.',
-  'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-  'Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
-  'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
-  'Sed sed nisi sed augue convallis suscipit in sed felis.',
-  'Aliquam erat volutpat.',
-  'Nunc fermentum tortor ac porta dapibus.',
-  'In rutrum ac purus sit amet tempus.',
+  ' Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+  ' Cras aliquet varius magna, non porta ligula feugiat eget.',
+  ' Fusce tristique felis at fermentum pharetra.',
+  ' Aliquam id orci ut lectus varius viverra.',
+  ' Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
+  ' Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum.',
+  ' Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui.',
+  ' Sed sed nisi sed augue convallis suscipit in sed felis.',
+  ' Aliquam erat volutpat.',
+  ' Nunc fermentum tortor ac porta dapibus.',
+  ' In rutrum ac purus sit amet tempus.',
 ];
 
 const generateTitle = () => {
@@ -95,13 +95,13 @@ const generateGenres = () => {
   return genresShuffle.slice(0, randomIndex);
 };
 const generateActors = () => {
-  const randomIndex = getRandomInteger(1, peoples.length - 1);
-  const actors = shuffle(peoples.slice());
+  const randomIndex = getRandomInteger(1, people.length - 1);
+  const actors = shuffle(people.slice());
   return actors.slice(0, randomIndex);
 };
 const generateDirector = () => {
-  const randomIndex = getRandomInteger(1, peoples.length - 1);
-  return peoples[randomIndex];
+  const randomIndex = getRandomInteger(1, people.length - 1);
+  return people[randomIndex];
 };
 const generateImage = () => {
   const randomIndex = getRandomInteger(0, images.length - 1);
@@ -127,7 +127,7 @@ const generateDateRelease = () => {
   return dayjs().add(randomDay, 'day').add(randomMonth, 'month').year(randomYear);
 };
 
-const generateWatchingDate =() => {
+const generateWatchingDate = () => {
   const isDate = Boolean(getRandomInteger(0, 1));
 
   if (!isDate) {
@@ -139,11 +139,18 @@ const generateWatchingDate =() => {
 
   return dayjs().add(daysGap, 'day').toDate();
 };
+const COUNT_COMMENT = 10;
 
-export const generateCardFilm = () => (
+const generateCommentsList = () => {
+  const count = getRandomInteger(0, COUNT_COMMENT);
+  const comments = Array.from({length: count}, generateComment);
+  return comments;
+};
+
+export const generateCardFilm = (id) => (
   {
-    id: 1,
-    commets: getRandomInteger(0, MAX_COMMENTS),
+    id,
+    comments: generateCommentsList(),
     filmInfo: {
       title: generateTitle(),
       alternativeTitle: generateAlternativeTitle(),

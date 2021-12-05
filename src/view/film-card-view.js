@@ -1,13 +1,13 @@
 import dayjs from 'dayjs';
-const duration = require('dayjs/plugin/duration');
+import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 export const createFilmCardTemplate = (cardItem) => {
   const {filmInfo, release, userDetails} = cardItem;
 
 
-  const hours =Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
-  const minutes =dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
+  const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
+  const minutes = dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
   const timeDuration = (hours===0) ?  `${minutes}m` : `${hours}h ${minutes}m`;
 
   const releaseYear = dayjs(release.date).format('YYYY');

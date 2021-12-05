@@ -4,10 +4,9 @@ export const createProfileTemplate = (filter) => {
   let profileName = 'Movie Buff';
   if (history === 0) {
     profileName = '';
-  }
-  if (history <= 10) {
+  } else if (history <= 10) {
     profileName = 'Novice';
-  } else if (history <= 20 && history > 10) {
+  } else if (history > 10 && history <= 20) {
     profileName = 'Fan';
   }
 
