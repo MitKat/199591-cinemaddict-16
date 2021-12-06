@@ -19,7 +19,6 @@ const FILM_COUNT = 28;
 const FILM_COUNT_STEP = 5;
 const filmCards = Array.from({length: FILM_COUNT}, (_, i) => generateCardFilm(i+1));
 
-console.log(filmCards);
 const filters = generateFilter(filmCards);
 
 const siteHeaderElement = document.querySelector('.header');
