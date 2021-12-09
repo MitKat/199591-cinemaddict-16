@@ -1,3 +1,4 @@
+import {createElement} from '../render.js';
 
 const createCommentItemTemplate = (comment) => {
   const {author, text, date, emotion} = comment;
@@ -17,7 +18,7 @@ const createCommentItemTemplate = (comment) => {
 </li>`;
 };
 
-export const createCommentsPopupTemplate = (film) => {
+const createCommentsPopupTemplate = (film) => {
   const {comments} = film;
   const commentItemTemplate = comments.map((comment) => createCommentItemTemplate(comment))
     .join(' ');
@@ -30,3 +31,27 @@ export const createCommentsPopupTemplate = (film) => {
   </ul>
 </section>`;
 };
+
+export default class CommentsPopupView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+    return this.#element;
+  }
+
+  get template() {
+    return createCommentsPopupTemplate(this.#film);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

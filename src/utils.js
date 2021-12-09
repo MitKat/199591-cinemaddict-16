@@ -18,15 +18,16 @@ export function getRandomFloatNumber(number1, number2, floatPoint) {
 }
 // функция взята с просторов интернета
 export function shuffle(array) {
-  let currentIndex = array.length,  randomIndex;
+  const arrayCopy = array.slice();
+  let currentIndex = arrayCopy.length,  randomIndex;
   // While there remain elements to shuffle...
   while (currentIndex !== 0) {
     // Pick a remaining element...
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
     // And swap it with the current element.
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+    [arrayCopy[currentIndex], arrayCopy[randomIndex]] = [
+      arrayCopy[randomIndex], arrayCopy[currentIndex]];
   }
-  return array;
+  return arrayCopy;
 }
