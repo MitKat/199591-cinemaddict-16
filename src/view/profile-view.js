@@ -1,4 +1,6 @@
-export const createProfileTemplate = (filter) => {
+import {createElement} from '../render.js';
+
+const createProfileTemplate = (filter) => {
   const {history} = filter;
 
   let profileName = 'Movie Buff';
@@ -15,3 +17,28 @@ export const createProfileTemplate = (filter) => {
   <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
   </section>`);
 };
+
+export default class ProfileView {
+  #element = null;
+  #filter = null;
+
+  constructor(filter) {
+    this.#filter = filter;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createProfileTemplate(this.#filter);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

@@ -1,12 +1,13 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import {createElement} from '../render.js';
 dayjs.extend(duration);
 
-export const createPopupTemplate = (cardItem) => {
+const createPopupTemplate = (cardItem) => {
   const {filmInfo, release, userDetails} = cardItem;
 
-  const hours =Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
-  const minutes =dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
+  const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
+  const minutes = dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
   const timeDuration = (hours===0) ?  `${minutes}m` : `${hours}h ${minutes}m`;
 
   const releaseDate = dayjs(release.date).format('DD MMMM YYYY');
@@ -111,3 +112,28 @@ export const createPopupTemplate = (cardItem) => {
   </form>
 </section>`;
 };
+
+export default class PopupView {
+  #element = null;
+  #cardItem = null;
+
+  constructor(cardItem) {
+    this.#cardItem = cardItem;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+    return this.#element;
+  }
+
+  get template() {
+    return createPopupTemplate(this.#cardItem);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
+

@@ -1,4 +1,6 @@
-export const createMainNavigationTemplate = (filter) => {
+import {createElement} from '../render.js';
+
+const createMainNavigationTemplate = (filter) => {
   const {wachlist, history, favorites} = filter;
 
   return(
@@ -14,4 +16,26 @@ export const createMainNavigationTemplate = (filter) => {
   );
 };
 
+export default class MainNavigationView {
+  #element = null;
+  #filter = null;
 
+  constructor(filter) {
+    this.#filter = filter;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+    return this.#element;
+  }
+
+  get template() {
+    return createMainNavigationTemplate(this.#filter);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
