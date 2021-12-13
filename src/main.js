@@ -29,28 +29,31 @@ const renderFilm = (container, film) => {
   const filmCard = new FilmCardView(film);
 
   const body = document.querySelector('body');
-  const popupShowHandler = filmCard.element.querySelector('.film-card__link');
+  const filmCardTitle = filmCard.element.querySelector('.film-card__link');
 
-  popupShowHandler.addEventListener('click', () => {
+  filmCardTitle.addEventListener('click', () => {
     const popupComponent = new PopupView(film);
 
     body.classList.add('hide-overflow');
 
-    render(siteFooterElement, popupComponent.element, RenderPosition.BEFOREEND);
+    const popupOpen = siteFooterElement.querySelector('.film-details');
 
-    const popupComments = document.querySelector('.film-details__bottom-container');
+    if (popupOpen !== null) {
+      siteFooterElement.removeChild(popupOpen);
+      siteFooterElement.appendChild(popupComponent.element);
+    } else {
+      siteFooterElement.appendChild(popupComponent.element);
+    }
 
-    render(popupComments, new CommentsPopupView(film).element, RenderPosition.BEFOREEND);
-    render(popupComments, new NewCommentView().element, RenderPosition.BEFOREEND);
-    // siteFooterElement.appendChild(popupComponent.element);
-    // popupComments.appendChild(new CommentsPopupView(film).element);
-    // popupComments.appendChild(new NewCommentView().element);
+    const popupComments = popupComponent.element.querySelector('.film-details__bottom-container');
 
-    const popupCloseHandler = popupComponent.element.querySelector('.film-details__close');
+    popupComments.appendChild(new CommentsPopupView(film).element);
+    popupComments.appendChild(new NewCommentView().element);
 
-    popupCloseHandler.addEventListener('click', () => {
-      popupComponent.element.remove();
-      // siteFooterElement.removeChild(popupComponent.element);
+    const popupClose = popupComponent.element.querySelector('.film-details__close');
+
+    popupClose.addEventListener('click', () => {
+      siteFooterElement.removeChild(popupComponent.element);
       body.classList.remove('hide-overflow');
     });
 
@@ -89,7 +92,7 @@ const renderFilmsList = (container, films) => {
     return;
   }
 
-  for (let i=0; i< FILM_COUNT_STEP; i++) {
+  for (let i = 0; i < FILM_COUNT_STEP; i++) {
     renderFilm(filmsContainer, films[i]);
   }
 
