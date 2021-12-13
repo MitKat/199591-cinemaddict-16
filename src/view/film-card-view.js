@@ -5,7 +5,7 @@ dayjs.extend(duration);
 
 
 const createFilmCardTemplate = (cardItem) => {
-  const {filmInfo, release, userDetails} = cardItem;
+  const {comments, filmInfo, release, userDetails} = cardItem;
 
 
   const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
@@ -37,7 +37,7 @@ const createFilmCardTemplate = (cardItem) => {
     </p>
     <img src="${filmInfo.poster}" alt="" class="film-card__poster">
     <p class="film-card__description">${filmInfo.description}</p>
-    <span class="film-card__comments">18 comments</span>
+    <span class="film-card__comments">${comments.length} comments</span>
   </a>
   <div class="film-card__controls">
     <button class="film-card__controls-item ${watchlistClassName}" type="button">Add to watchlist</button>
