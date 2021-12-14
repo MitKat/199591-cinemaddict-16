@@ -1,6 +1,6 @@
+import AbstractView from './abstract-view.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
-import {createElement} from '../render.js';
 dayjs.extend(duration);
 
 const createPopupTemplate = (cardItem) => {
@@ -113,27 +113,27 @@ const createPopupTemplate = (cardItem) => {
 </section>`;
 };
 
-export default class PopupView {
-  #element = null;
+export default class PopupView extends AbstractView {
   #cardItem = null;
 
   constructor(cardItem) {
+    super();
     this.#cardItem = cardItem;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
   }
 
   get template() {
     return createPopupTemplate(this.#cardItem);
   }
 
-  removeElement() {
-    this.#element = null;
+  setClickPopupFilmHandler = (callback) => {
+    this._callback.clickPopup = callback;
+    this.element.querySelector('.film-details__close').addEventListener('click', this.#clickPopupHandler);
   }
+
+  #clickPopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.clickPopup();
+  }
+
 }
 

@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from './abstract-view.js';
 
 const createMainNavigationTemplate = (filter) => {
   const {wachlist, history, favorites} = filter;
@@ -16,26 +16,15 @@ const createMainNavigationTemplate = (filter) => {
   );
 };
 
-export default class MainNavigationView {
-  #element = null;
+export default class MainNavigationView extends AbstractView {
   #filter = null;
 
   constructor(filter) {
+    super();
     this.#filter = filter;
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
   }
 
   get template() {
     return createMainNavigationTemplate(this.#filter);
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
