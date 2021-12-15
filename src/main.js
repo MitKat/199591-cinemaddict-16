@@ -24,44 +24,46 @@ const filters = generateFilter(filmCards);
 const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
+const body = document.querySelector('body');
+
+const onEscKeyDown = (evt) => {
+  if (evt.key === 'Escape' || evt.key === 'Esc') {
+    evt.preventDefault();
+    body.classList.remove('hide-overflow');
+    const popupFilm2 = siteFooterElement.querySelector('.film-details');
+    if (popupFilm2 !== null) {
+      siteFooterElement.removeChild(popupFilm2);
+    }
+    document.removeEventListener('keydown', onEscKeyDown);
+  }
+};
 
 const renderFilm = (container, film) => {
   const filmCard = new FilmCardView(film);
 
-  const body = document.querySelector('body');
-
   filmCard.setClickFilmHandler (() => {
     const popupComponent = new PopupView(film);
-    const popupFilm = siteFooterElement.querySelector('.film-details');
-
     body.classList.add('hide-overflow');
 
-    if (popupFilm !== null) {
-      siteFooterElement.removeChild(popupFilm);
+    const popupFilmPrevious = siteFooterElement.querySelector('.film-details');
+
+    if (popupFilmPrevious !== null) {
+      siteFooterElement.removeChild(popupFilmPrevious);
       siteFooterElement.appendChild(popupComponent.element);
     } else {
       siteFooterElement.appendChild(popupComponent.element);
+      document.addEventListener('keydown', onEscKeyDown);
     }
 
     const popupComments = popupComponent.element.querySelector('.film-details__bottom-container');
     render(popupComments, new CommentsPopupView(film), RenderPosition.BEFOREEND);
     render(popupComments, new NewCommentView(), RenderPosition.BEFOREEND);
 
-    popupComponent.setClickPopupFilmHandler(() => {
+    popupComponent.setClosePopupHandler(() => {
       siteFooterElement.removeChild(popupComponent.element);
       body.classList.remove('hide-overflow');
+      document.removeEventListener('keydown', onEscKeyDown);
     });
-
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        body.classList.remove('hide-overflow');
-        siteFooterElement.removeChild(popupComponent.element);
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
-
-    document.addEventListener('keydown', onEscKeyDown);
   });
 
   render(container, filmCard, RenderPosition.BEFOREEND);
