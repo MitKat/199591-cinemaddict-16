@@ -5,7 +5,7 @@ import MainNavigationView from './view/main-navigation-view.js';
 import ProfileView from './view/profile-view.js';
 import FooterView from './view/footer-view.js';
 
-import FilmPresenter from './presenter/film-list-presenter.js';
+import FilmListPresenter from './presenter/film-list-presenter.js';
 
 const FILM_COUNT = 33;
 
@@ -20,7 +20,7 @@ render(siteMainElement, new MainNavigationView(filters), RenderPosition.AFTERBEG
 
 render(siteHeaderElement, new ProfileView(filters), RenderPosition.BEFOREEND);
 
-const filmPresenter = new FilmPresenter(siteMainElement);
-filmPresenter.init(filmCards);
+const filmListPresenter = new FilmListPresenter(siteMainElement);
+filmListPresenter.init(filmCards);
 
 render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);
