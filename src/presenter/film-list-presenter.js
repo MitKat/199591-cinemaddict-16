@@ -6,9 +6,7 @@ import NoFilmsView from '../view/no-films-view';
 import FilmPresenter from './film-presenter';
 import {render, RenderPosition, remove} from '../utils/render.js';
 
-
 const FILM_COUNT_STEP = 5;
-
 
 export default class FilmListPresenter {
     #filmListContainer = null;
@@ -42,51 +40,11 @@ export default class FilmListPresenter {
     }
 
     #renderFilm = (film) => {
-    //   const filmCard = new FilmCardView(film);
-
-
-      //   filmCard.setClickFilmHandler (() => {
-      //     const popupComponent = new PopupView(film);
-      //     body.classList.add('hide-overflow');
-
-      //     const popupFilmPrevious = siteFooterElement.querySelector('.film-details');
-
-      //     if (popupFilmPrevious !== null) {
-      //       siteFooterElement.removeChild(popupFilmPrevious);
-      //       siteFooterElement.appendChild(popupComponent.element);
-      //     } else {
-      //       siteFooterElement.appendChild(popupComponent.element);
-      //       document.addEventListener('keydown', this.#onEscKeyDown);
-      //     }
-
-      //     const popupComments = popupComponent.element.querySelector('.film-details__bottom-container');
-      //     render(popupComments, new CommentsPopupView(film), RenderPosition.BEFOREEND);
-      //     render(popupComments, new NewCommentView(), RenderPosition.BEFOREEND);
-
-      //     popupComponent.setClosePopupHandler(() => {
-      //       siteFooterElement.removeChild(popupComponent.element);
-      //       body.classList.remove('hide-overflow');
-      //       document.removeEventListener('keydown', this.#onEscKeyDown);
-      //     });
-      //   });
-
-      //   render(container, filmCard, RenderPosition.BEFOREEND);
       const filmsContainer = this.#filmsListComponent.element.querySelector('.films-list__container');
+
       const filmPresenter = new FilmPresenter(filmsContainer);
       filmPresenter.init(film);
     }
-
-    // #onEscKeyDown = (evt) => {
-    //   if (evt.key === 'Escape' || evt.key === 'Esc') {
-    //     evt.preventDefault();
-    //     body.classList.remove('hide-overflow');
-    //     const popupFilm2 = siteFooterElement.querySelector('.film-details');
-    //     if (popupFilm2 !== null) {
-    //       siteFooterElement.removeChild(popupFilm2);
-    //     }
-    //     document.removeEventListener('keydown', this.#onEscKeyDown());
-    //   }
-    // };
 
     #renderFilmList = (films) => {
 

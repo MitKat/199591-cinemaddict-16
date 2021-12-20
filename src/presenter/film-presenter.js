@@ -25,11 +25,11 @@ export default class FilmPresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       body.classList.remove('hide-overflow');
-      const popupFilm2 = siteFooterElement.querySelector('.film-details');
-      if (popupFilm2 !== null) {
-        siteFooterElement.removeChild(popupFilm2);
+      const popup = siteFooterElement.querySelector('.film-details');
+      if (popup !== null) {
+        siteFooterElement.removeChild(popup);
       }
-      document.removeEventListener('keydown', this.#onEscKeyDown());
+      document.removeEventListener('keydown', this.#onEscKeyDown);
     }
   };
 
