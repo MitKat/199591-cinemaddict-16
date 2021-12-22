@@ -18,6 +18,7 @@ export default class FilmListPresenter {
     #noFilmsComponent = new NoFilmsView();
 
     #movies = [];
+    #renderedFilmCount = FILM_COUNT_STEP;
 
     constructor (filmListContainer) {
       this.#filmListContainer = filmListContainer;
@@ -26,9 +27,7 @@ export default class FilmListPresenter {
     init = (movies) => {
       this.#movies = [...movies];
 
-
       render(this.#filmListContainer, this.#sortComponent, RenderPosition.BEFOREEND);
-
       render(this.#filmListContainer, this.#filmsBlockComponent, RenderPosition.BEFOREEND);
       render(this.#filmsBlockComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
 
@@ -46,6 +45,22 @@ export default class FilmListPresenter {
       filmPresenter.init(film);
     }
 
+    #handlerButtonShowClick = () => {
+      this.#movies
+        .slice(this.#renderedFilmCount, this.#renderedFilmCount + FILM_COUNT_STEP)
+        .forEach((film) => this.#renderFilm(film));
+
+      this.#renderedFilmCount += FILM_COUNT_STEP;
+
+      if (this.#renderedFilmCount >= this.#movies.length) {
+        remove(this.#buttonShowMoreComponent);
+      }
+    }
+
+    #renderButtonShowMore = () => {
+      this.#buttonShowMoreComponent.setClickHandler (this.#handlerButtonShowClick);
+    }
+
     #renderFilmList = (films) => {
 
       if (films.length === 0) {
@@ -58,20 +73,9 @@ export default class FilmListPresenter {
       }
 
       if (films.length > FILM_COUNT_STEP) {
-        let renderedFilmCount = FILM_COUNT_STEP;
         render(this.#filmsListComponent, this.#buttonShowMoreComponent, RenderPosition.BEFOREEND);
 
-        this.#buttonShowMoreComponent.setClickHandler (() => {
-          films
-            .slice(renderedFilmCount, renderedFilmCount + FILM_COUNT_STEP)
-            .forEach((film) => this.#renderFilm(film));
-
-          renderedFilmCount += FILM_COUNT_STEP;
-
-          if (renderedFilmCount >= this.#movies.length) {
-            remove(this.#buttonShowMoreComponent);
-          }
-        });
+        this.#renderButtonShowMore();
       }
     }
 }
