@@ -5,6 +5,7 @@ import ButtonShowMoreView from '../view/button-show-more-view';
 import NoFilmsView from '../view/no-films-view';
 import FilmPresenter from './film-presenter';
 import {render, RenderPosition, remove} from '../utils/render.js';
+import {updateItem} from '../utils/common.js';
 
 const FILM_COUNT_STEP = 5;
 
@@ -19,6 +20,8 @@ export default class FilmListPresenter {
 
     #movies = [];
     #renderedFilmCount = FILM_COUNT_STEP;
+
+    #filmPresenter = new Map();
 
     constructor (filmListContainer) {
       this.#filmListContainer = filmListContainer;
@@ -41,8 +44,9 @@ export default class FilmListPresenter {
     #renderFilm = (film) => {
       const filmsContainer = this.#filmsListComponent.element.querySelector('.films-list__container');
 
-      const filmPresenter = new FilmPresenter(filmsContainer);
+      const filmPresenter = new FilmPresenter(filmsContainer, this.#handleFilmChange);
       filmPresenter.init(film);
+      this.#filmPresenter.set(film.id, filmPresenter);
     }
 
     #handlerButtonShowClick = () => {
@@ -58,24 +62,36 @@ export default class FilmListPresenter {
     }
 
     #renderButtonShowMore = () => {
-      this.#buttonShowMoreComponent.setClickHandler (this.#handlerButtonShowClick);
+      this.#buttonShowMoreComponent.setClickHandler(this.#handlerButtonShowClick);
     }
 
-    #renderFilmList = (films) => {
+    #renderFilmList = () => {
 
-      if (films.length === 0) {
+      if (this.#movies.length === 0) {
         this.#renderNoFilms();
         return;
       }
 
       for (let i = 0; i < FILM_COUNT_STEP; i++) {
-        this.#renderFilm(films[i]);
+        this.#renderFilm(this.#movies[i]);
       }
 
-      if (films.length > FILM_COUNT_STEP) {
+      if (this.#movies.length > FILM_COUNT_STEP) {
         render(this.#filmsListComponent, this.#buttonShowMoreComponent, RenderPosition.BEFOREEND);
 
         this.#renderButtonShowMore();
       }
+    }
+
+    #clearFilmList = () => {
+      this.#filmPresenter.forEach((presenter) => presenter.destroy());
+      this.#filmPresenter.clear();
+      this.#renderedFilmCount = FILM_COUNT_STEP;
+      remove(this.#buttonShowMoreComponent);
+    }
+
+    #handleFilmChange = (updatedFilm) => {
+      this.#movies = updateItem(this.#movies, updatedFilm);
+      this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
     }
 }

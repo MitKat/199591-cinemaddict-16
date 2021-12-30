@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 const createPopupTemplate = (cardItem) => {
-  const {filmInfo, release, userDetails} = cardItem;
+  const {filmInfo, release, isWatchlist, isAlreadyWatched, isFavorite} = cardItem;
 
   const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
   const minutes = dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
@@ -23,15 +23,15 @@ const createPopupTemplate = (cardItem) => {
     }
   }
 
-  const favoriteClassName = userDetails.isFavorite
+  const favoriteClassName = isFavorite
     ? 'film-details__control-button--favorite film-details__control-button--active'
     : 'film-details__control-button--favorite';
 
-  const watchedClassName = userDetails.isAlreadyWatched
+  const watchedClassName = isAlreadyWatched
     ? 'film-details__control-button--watched film-details__control-button--active'
     : 'film-details__control-button--watched';
 
-  const watchlistClassName = userDetails.isWatchlist
+  const watchlistClassName = isWatchlist
     ? 'film-details__control-button--watchlist film-details__control-button--active'
     : 'film-details__control-button--watchlist';
 
@@ -126,13 +126,43 @@ export default class PopupView extends AbstractView {
   }
 
   setClosePopupHandler = (callback) => {
-    this._callback.click = callback;
-    this.element.querySelector('.film-details__close').addEventListener('click', this.#clickCloseHandler);
+    this._callback.popupCLoseCLick = callback;
+    this.element.querySelector('.film-details__close').addEventListener('click', this.#popupCloseHandler);
   }
 
-  #clickCloseHandler = (evt) => {
+  setClickButtonPopupWatchlist = (callback) => {
+    this._callback.clickPopupWatchlist = callback;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickPopupHandler);
+  }
+
+  setClickButtonPopupWatched = (callback) => {
+    this._callback.clickPopupWatched = callback;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickPopupHandler);
+  }
+
+  setClickButtonPopupFavorites = (callback) => {
+    this._callback.clickPopupFavorites = callback;
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoritesClickPopupHandler);
+  }
+
+  #popupCloseHandler = (evt) => {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.popupCLoseCLick();
+  }
+
+  #watchlistClickPopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.clickPopupWatchlist();
+  }
+
+  #watchedClickPopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.clickPopupWatched();
+  }
+
+  #favoritesClickPopupHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.clickPopupFavorites();
   }
 
 }

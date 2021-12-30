@@ -1,6 +1,6 @@
-const filterWatchlist = (films) => films.filter((film) => film.userDetails.isWatchlist).length;
-const filterHistory = (films) => films.filter((film) => film.userDetails.isAlreadyWatched).length;
-const filterFavorits = (films) => films.filter((film) => film.userDetails.isFavorite).length;
+const filterWatchlist = (films) => films.filter((film) => film.isWatchlist).length;
+const filterHistory = (films) => films.filter((film) => film.isAlreadyWatched).length;
+const filterFavorits = (films) => films.filter((film) => film.isFavorite).length;
 
 export const generateFilter = (films) => (
   {
