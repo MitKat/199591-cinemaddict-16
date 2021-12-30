@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { getRandomFloatNumber, getRandomInteger, shuffle } from '../utils/common.js';
 import {generateComment} from './comment';
-import {nanoid} from 'nanoid';
 const FLOAT_POINT_RATING = 1;
 const MIN_RATING = 0.1;
 const MAX_RATING = 9.9;
