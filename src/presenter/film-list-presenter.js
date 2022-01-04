@@ -23,6 +23,7 @@ export default class FilmListPresenter {
     #sourcedMovies = [];
     #currentSortType = SortType.DEFAULT;
     #renderedFilmCount = FILM_COUNT_STEP;
+    #sortingComponent = null;
 
 
     #filmPresenter = new Map();
@@ -61,9 +62,9 @@ export default class FilmListPresenter {
     };
 
     #renderSort = () => {
-      const sortComponent = new SortView(this.#currentSortType);
-      render(this.#filmListContainer, sortComponent, RenderPosition.BEFOREEND);
-      sortComponent.setSortChangeHandler(this.#handleSortTypeChange);
+      this.#sortingComponent = new SortView(this.#currentSortType);
+      render(this.#filmListContainer, this.#sortingComponent, RenderPosition.AFTERBEGIN);
+      this.#sortingComponent.setSortChangeHandler(this.#handleSortTypeChange);
     }
 
     #renderFilm = (film) => {
@@ -106,13 +107,14 @@ export default class FilmListPresenter {
     }
 
     #handleSortTypeChange = (sortType) => {
-
       if (this.#currentSortType === sortType) {
         return;
       }
-
       this.#sortFilms(sortType);
+
+      remove(this.#sortingComponent);
       this.#clearFilmList();
+
       this.#renderSort();
       this.#renderFilmList();
     }

@@ -16,7 +16,7 @@ const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
-render(siteMainElement, new MainNavigationView(filters), RenderPosition.AFTERBEGIN);
+render(siteMainElement, new MainNavigationView(filters), RenderPosition.BEFOREBEGIN);
 
 render(siteHeaderElement, new ProfileView(filters), RenderPosition.BEFOREEND);
 
