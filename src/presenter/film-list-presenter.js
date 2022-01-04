@@ -6,20 +6,24 @@ import NoFilmsView from '../view/no-films-view';
 import FilmPresenter from './film-presenter';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {updateItem} from '../utils/common.js';
+import {SortType} from '../utils/const';
+import dayjs from 'dayjs';
 
 const FILM_COUNT_STEP = 5;
 
 export default class FilmListPresenter {
     #filmListContainer = null;
 
-    #sortComponent = new SortView();
     #filmsBlockComponent = new FilmsBlockView();
     #filmsListComponent = new FilmsListView();
     #buttonShowMoreComponent = new ButtonShowMoreView();
     #noFilmsComponent = new NoFilmsView();
 
     #movies = [];
+    #sourcedMovies = [];
+    #currentSortType = SortType.DEFAULT;
     #renderedFilmCount = FILM_COUNT_STEP;
+
 
     #filmPresenter = new Map();
 
@@ -28,9 +32,12 @@ export default class FilmListPresenter {
     }
 
     init = (movies) => {
-      this.#movies = [...movies];
 
-      render(this.#filmListContainer, this.#sortComponent, RenderPosition.BEFOREEND);
+      this.#movies = [...movies];
+      this.#sourcedMovies = [...movies];
+
+      this.#renderSort();
+      // render(this.#filmListContainer, this.#sortComponent, RenderPosition.BEFOREEND);
       render(this.#filmListContainer, this.#filmsBlockComponent, RenderPosition.BEFOREEND);
       render(this.#filmsBlockComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
 
@@ -39,6 +46,24 @@ export default class FilmListPresenter {
 
     #renderNoFilms = () => {
       render(this.#filmsListComponent, this.#noFilmsComponent, RenderPosition.BEFOREEND);
+    }
+
+    #sortDateFunction = (filmA, filmB) => {
+      const countA = dayjs(filmA.release.date).format('YYYY');
+      const countB = dayjs(filmB.release.date).format('YYYY');
+      return countB - countA;
+    };
+
+    #sortRatingFunction = (filmA, filmB) => {
+      const countA = filmA.filmInfo.totalRating;
+      const countB = filmB.filmInfo.totalRating;
+      return countB - countA;
+    };
+
+    #renderSort = () => {
+      const sortComponent = new SortView(this.#currentSortType);
+      render(this.#filmListContainer, sortComponent, RenderPosition.BEFOREEND);
+      sortComponent.setSortChangeHandler(this.#handleSortTypeChange);
     }
 
     #renderFilm = (film) => {
@@ -65,8 +90,34 @@ export default class FilmListPresenter {
       this.#buttonShowMoreComponent.setClickHandler(this.#handlerButtonShowClick);
     }
 
-    #renderFilmList = () => {
+    #sortFilms = (sortType) => {
+      switch (sortType) {
+        case SortType.DATE:
+          this.#movies.sort(this.#sortDateFunction);
+          break;
+        case SortType.RATING:
+          this.#movies.sort(this.#sortRatingFunction);
+          break;
+        default:
+          this.#movies = [...this.#sourcedMovies];
+      }
 
+      this.#currentSortType = sortType;
+    }
+
+    #handleSortTypeChange = (sortType) => {
+
+      if (this.#currentSortType === sortType) {
+        return;
+      }
+
+      this.#sortFilms(sortType);
+      this.#clearFilmList();
+      this.#renderSort();
+      this.#renderFilmList();
+    }
+
+    #renderFilmList = () => {
       if (this.#movies.length === 0) {
         this.#renderNoFilms();
         return;
@@ -92,6 +143,7 @@ export default class FilmListPresenter {
 
     #handleFilmChange = (updatedFilm) => {
       this.#movies = updateItem(this.#movies, updatedFilm);
+      this.#sourcedMovies =updateItem(this.#sourcedMovies, updatedFilm);
       this.#filmPresenter.get(updatedFilm.id).init(updatedFilm);
     }
 }
