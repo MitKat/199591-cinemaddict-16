@@ -5,7 +5,7 @@ dayjs.extend(duration);
 
 
 const createFilmCardTemplate = (cardItem) => {
-  const {comments, filmInfo, release, isWatchlist, isAlreadyWatched, isFavorite} = cardItem;
+  const {comments, filmInfo, release, userDetails} = cardItem;
 
 
   const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
@@ -14,15 +14,15 @@ const createFilmCardTemplate = (cardItem) => {
 
   const releaseYear = dayjs(release.date).format('YYYY');
 
-  const favoriteClassName = isFavorite
+  const favoriteClassName = userDetails.isFavorite
     ? 'film-card__controls-item--favorite film-card__controls-item--active'
     : 'film-card__controls-item--favorite';
 
-  const watchedClassName = isAlreadyWatched
+  const watchedClassName = userDetails.isAlreadyWatched
     ? 'film-card__controls-item--mark-as-watched film-card__controls-item--active'
     : 'film-card__controls-item--mark-as-watched';
 
-  const watchlistClassName = isWatchlist
+  const watchlistClassName = userDetails.isWatchlist
     ? 'film-card__controls-item--add-to-watchlist film-card__controls-item--active'
     : 'film-card__controls-item--add-to-watchlist';
 

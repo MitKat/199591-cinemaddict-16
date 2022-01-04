@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 const createPopupTemplate = (cardItem) => {
-  const {filmInfo, release, isWatchlist, isAlreadyWatched, isFavorite} = cardItem;
+  const {filmInfo, release, userDetails} = cardItem;
 
   const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
   const minutes = dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
@@ -23,15 +23,15 @@ const createPopupTemplate = (cardItem) => {
     }
   }
 
-  const favoriteClassName = isFavorite
+  const favoriteClassName = userDetails.isFavorite
     ? 'film-details__control-button--favorite film-details__control-button--active'
     : 'film-details__control-button--favorite';
 
-  const watchedClassName = isAlreadyWatched
+  const watchedClassName = userDetails.isAlreadyWatched
     ? 'film-details__control-button--watched film-details__control-button--active'
     : 'film-details__control-button--watched';
 
-  const watchlistClassName = isWatchlist
+  const watchlistClassName = userDetails.isWatchlist
     ? 'film-details__control-button--watchlist film-details__control-button--active'
     : 'film-details__control-button--watchlist';
 

@@ -168,11 +168,11 @@ export const generateCardFilm = (id) => (
       date: generateDateRelease(),
       country: generateCountry(),
     },
-    // userDetails: {
-    isWatchlist: Boolean(getRandomInteger(0, 1)),
-    isAlreadyWatched: Boolean(getRandomInteger(0, 1)),
-    isFavorite: Boolean(getRandomInteger(0, 1)),
-    watchingDate: generateWatchingDate(),
-    // },
+    userDetails: {
+      isWatchlist: Boolean(getRandomInteger(0, 1)),
+      isAlreadyWatched: Boolean(getRandomInteger(0, 1)),
+      isFavorite: Boolean(getRandomInteger(0, 1)),
+      watchingDate: generateWatchingDate(),
+    },
   }
 );
