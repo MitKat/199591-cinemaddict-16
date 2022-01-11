@@ -11,6 +11,7 @@ export default class FilmPresenter {
   #filmContainer = null;
   #movie = {};
   #changeData = null;
+  #smile = '';
 
   #filmComponent = null;
   #popupComponent = null;
@@ -71,7 +72,7 @@ export default class FilmPresenter {
   #renderPopupOpen = () => {
     this.#popupComponent = new PopupView(this.#movie);
     this.#popupCommentsComponent = new CommentsPopupView(this.#movie);
-    this.#popupNewCommentComponent = new NewCommentView();
+    this.#popupNewCommentComponent = new NewCommentView(this.#smail);
 
     body.classList.add('hide-overflow');
 
@@ -89,6 +90,8 @@ export default class FilmPresenter {
     render(popupComments, this.#popupCommentsComponent, RenderPosition.BEFOREEND);
     render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
 
+    this.#popupNewCommentComponent.setClickEmojiItem(this.#handleEmojiClick);
+
     this.#popupComponent.setClosePopupHandler(() => {
       siteFooterElement.removeChild(this.#popupComponent.element);
       this.#removeElementClosePopup();
@@ -102,6 +105,14 @@ export default class FilmPresenter {
   destroy = () => {
     remove(this.#filmComponent);
     remove(this.#popupComponent);
+  }
+
+  #handleEmojiClick = (evt) => {
+    this.#smile = `${evt.value}.png`;
+
+    remove(this.#popupNewCommentComponent);
+    // this.#smile = 'angry.png';
+    render(this.#popupComponent.element.querySelector('.film-details__bottom-container'), new NewCommentView(this.#smile), RenderPosition.BEFOREEND);
   }
 
   #handleWatchlistClick = () => {

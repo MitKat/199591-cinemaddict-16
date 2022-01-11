@@ -1,8 +1,14 @@
 import AbstractView from './abstract-view.js';
 
-const createNewCommentTemplate = () => (
-  `<div class="film-details__new-comment">
-     <div class="film-details__add-emoji-label"></div>
+const createNewCommentTemplate = (emotion) => {
+  const emojiImage = emotion !== ''
+    ? `<img src="./images/emoji/${emotion}" width="55" height="55" alt="${emotion}">`
+    : '';
+
+  return `<div class="film-details__new-comment">
+     <div class="film-details__add-emoji-label">
+     ${emojiImage}
+     </div>
 
      <label class="film-details__comment-label">
        <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
@@ -29,13 +35,31 @@ const createNewCommentTemplate = () => (
          <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
        </label>
      </div>
-     </div>`
-);
+    </div>`;
+};
 
 export default class NewCommentView extends AbstractView {
-  get template() {
-    return createNewCommentTemplate();
+  #emotion = null;
+
+  constructor(emotion) {
+    super();
+    this.#emotion = emotion;
   }
+
+  get template() {
+    return createNewCommentTemplate(this.#emotion);
+  }
+
+  setClickEmojiItem = (callback) => {
+    this._callback.clickEmojiItem = callback;
+    this.element.querySelectorAll('.film-details__emoji-item').forEach((emotion) => emotion.addEventListener('click', this.#clickEmojiHandler));
+  }
+
+  #clickEmojiHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.clickEmojiItem();
+  }
+
 }
 
 
