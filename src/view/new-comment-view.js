@@ -57,9 +57,8 @@ export default class NewCommentView extends AbstractView {
 
   #clickEmojiHandler = (evt) => {
     evt.preventDefault();
-    this._callback.clickEmojiItem();
+    this._callback.clickEmojiItem(evt);
   }
 
 }
-
 
