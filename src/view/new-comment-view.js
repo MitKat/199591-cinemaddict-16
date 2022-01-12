@@ -1,8 +1,14 @@
-import AbstractView from './abstract-view.js';
+// import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 
-const createNewCommentTemplate = (emotion) => {
-  const emojiImage = emotion !== ''
-    ? `<img src="./images/emoji/${emotion}" width="55" height="55" alt="${emotion}">`
+const createNewCommentTemplate = (_data) => {
+  const {smile, message} = _data;
+  const emojiImage = smile !== ''
+    ? `<img src="./images/emoji/${smile}.png" width="55" height="55" alt="${smile}">`
+    : '';
+
+  const comment = message !== ''
+    ? `${message}`
     : '';
 
   return `<div class="film-details__new-comment">
@@ -11,7 +17,7 @@ const createNewCommentTemplate = (emotion) => {
      </div>
 
      <label class="film-details__comment-label">
-       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
      </label>
 
      <div class="film-details__emoji-list">
@@ -38,26 +44,52 @@ const createNewCommentTemplate = (emotion) => {
     </div>`;
 };
 
-export default class NewCommentView extends AbstractView {
-  #emotion = null;
+export default class NewCommentView extends SmartView {
 
-  constructor(emotion) {
+  constructor() {
     super();
-    this.#emotion = emotion;
+
+    this._data = {
+      smile: '',
+      message: '',
+    };
+
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createNewCommentTemplate(this.#emotion);
+    return createNewCommentTemplate(this._data);
   }
 
-  setClickEmojiItem = (callback) => {
-    this._callback.clickEmojiItem = callback;
-    this.element.querySelectorAll('.film-details__emoji-item').forEach((emotion) => emotion.addEventListener('click', this.#clickEmojiHandler));
+  restoreHandlers = () => {
+    this.#setInnerHandlers();
+  }
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#descriptionInputHandler);
+    this.element.querySelectorAll('.film-details__emoji-item')
+      .forEach((emotion) => emotion.addEventListener('click', this.#clickEmojiHandler));
+    this.element.addEventListener('keydown', this.#onCtrlEnterKeyDownHandler);
+  }
+
+  #onCtrlEnterKeyDownHandler = (evt) => {
+    if (evt.ctrlKey && evt.keyCode === 13) {
+      evt.preventDefault();
+    }
   }
 
   #clickEmojiHandler = (evt) => {
     evt.preventDefault();
-    this._callback.clickEmojiItem(evt);
+    this.updateData({
+      smile: evt.target.value,
+    });
+  }
+
+  #descriptionInputHandler = (evt) => {
+    evt.preventDefault();
+    this.updateData({
+      message: evt.target.value,
+    }, true);
   }
 
 }
