@@ -156,5 +156,6 @@ export default class FilmPresenter {
       ...this.#movie.userDetails,
       isFavorite: !this.#movie.userDetails.isFavorite
     }});
+
   }
 }
