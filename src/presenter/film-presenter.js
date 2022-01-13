@@ -7,11 +7,20 @@ import {render, RenderPosition, remove, replace} from '../utils/render.js';
 const siteFooterElement = document.querySelector('.footer');
 const body = document.querySelector('body');
 
+// Идея следующая, мы должны задать структуру для нового комментария,
+//как сюда забрасывать наши данные я не знаю
+const commentNew = {
+  id: ' ',
+  author: 'Black',
+  text: '',
+  emotion: 'sleeping.png',
+  date: ' ',
+};
+
 export default class FilmPresenter {
   #filmContainer = null;
   #movie = {};
   #changeData = null;
-  #smile = '';
 
   #filmComponent = null;
   #popupComponent = null;
@@ -89,6 +98,29 @@ export default class FilmPresenter {
     const popupComments = this.#popupComponent.element.querySelector('.film-details__bottom-container');
     render(popupComments, this.#popupCommentsComponent, RenderPosition.BEFOREEND);
     render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
+
+
+    const onCtrlEnterKeyDownHandler = (evt) => {
+      if (evt.ctrlKey && evt.key === 'Enter') {
+        evt.preventDefault();
+
+        //удаляем компонент с комментариями
+        remove( this.#popupCommentsComponent);
+
+        const movieCommentsNewArray = this.#movie.comments.slice();
+
+        movieCommentsNewArray.push(commentNew);
+        this.#changeData({...this.#movie.comments,
+          comments: movieCommentsNewArray
+        });
+        // перерисовываем новые компоненты заново, но тут init ругается
+        render(popupComments, new CommentsPopupView(this.#movie), RenderPosition.BEFOREEND);
+        render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
+      }
+    };
+
+    this.#popupComponent.element.addEventListener('keydown', onCtrlEnterKeyDownHandler);
+
 
     this.#popupComponent.setClosePopupHandler(() => {
       siteFooterElement.removeChild(this.#popupComponent.element);

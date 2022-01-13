@@ -1,4 +1,3 @@
-// import AbstractView from './abstract-view.js';
 import SmartView from './smart-view.js';
 
 const createNewCommentTemplate = (_data) => {
@@ -69,14 +68,8 @@ export default class NewCommentView extends SmartView {
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#descriptionInputHandler);
     this.element.querySelectorAll('.film-details__emoji-item')
       .forEach((emotion) => emotion.addEventListener('click', this.#clickEmojiHandler));
-    this.element.addEventListener('keydown', this.#onCtrlEnterKeyDownHandler);
   }
 
-  #onCtrlEnterKeyDownHandler = (evt) => {
-    if (evt.ctrlKey && evt.keyCode === 13) {
-      evt.preventDefault();
-    }
-  }
 
   #clickEmojiHandler = (evt) => {
     evt.preventDefault();
