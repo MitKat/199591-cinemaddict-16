@@ -116,15 +116,17 @@ const createPopupTemplate = (cardItem) => {
 
 export default class PopupView extends SmartView {
   #cardItem = null;
-  #scrollTop = 0;
+  // #scrollTop = 0;
 
   constructor(cardItem) {
     super();
     this.#cardItem = cardItem;
 
+    this._data = {
+      scrollTop: 0,
+    };
 
-    this.element
-      .addEventListener('scroll', this.#onScroll);
+    window.addEventListener('scroll', this._data);
   }
 
   get template() {
@@ -132,16 +134,7 @@ export default class PopupView extends SmartView {
   }
 
   restoreHandlers = () => {
-    this.#setScrollPosition();
-  };
-
-  #onScroll = (evt) => {
-    evt.preventDefault();
-    this.#scrollTop = evt.target.scrollTop;
-  };
-
-  #setScrollPosition = () => {
-    this.element.scrollTop = this.#scrollTop;
+    window.addEventListener('scroll', this._data);
   };
 
   setClosePopupHandler = (callback) => {
@@ -181,7 +174,13 @@ export default class PopupView extends SmartView {
 
   #favoritesClickPopupHandler = (evt) => {
     evt.preventDefault();
+    this.updateData({
+      scrollTop: evt.target.scrollTop,
+    }, true);
+
     this._callback.clickPopupFavorites();
+
+    window.addEventListener('scroll', this._data);
   }
 
 }
