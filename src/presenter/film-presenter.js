@@ -105,9 +105,11 @@ export default class FilmPresenter {
       if (evt.ctrlKey && evt.key === 'Enter') {
         evt.preventDefault();
         this.#savePopupPosition();
+
         const movieCommentsNewArray = this.#movie.comments.slice();
 
-        commentNew.text = this.#popupNewCommentComponent.element.querySelector('.film-details__comment-input').value;
+        commentNew.text = this.#popupNewCommentComponent._data.message;
+        commentNew.emotion =  `${this.#popupNewCommentComponent._data.smile}.png`;
 
         if (commentNew.text !== '') {
           remove(this.#popupCommentsComponent);

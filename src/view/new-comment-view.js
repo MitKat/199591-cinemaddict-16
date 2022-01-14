@@ -73,6 +73,7 @@ export default class NewCommentView extends SmartView {
 
   #clickEmojiHandler = (evt) => {
     evt.preventDefault();
+
     this.updateData({
       smile: evt.target.value,
     });
