@@ -24,12 +24,18 @@ export default class FilmListPresenter {
     #currentSortType = SortType.DEFAULT;
     #renderedFilmCount = FILM_COUNT_STEP;
     #sortingComponent = null;
+    #moviesModel = null;
 
 
     #filmPresenter = new Map();
 
-    constructor (filmListContainer) {
+    constructor (filmListContainer, moviesModel) {
       this.#filmListContainer = filmListContainer;
+      this.#moviesModel = moviesModel;
+    }
+
+    get films() {
+      return this.#moviesModel.movies;
     }
 
     init = (movies) => {
@@ -38,7 +44,6 @@ export default class FilmListPresenter {
       this.#sourcedMovies = [...movies];
 
       this.#renderSort();
-      // render(this.#filmListContainer, this.#sortComponent, RenderPosition.BEFOREEND);
       render(this.#filmListContainer, this.#filmsBlockComponent, RenderPosition.BEFOREEND);
       render(this.#filmsBlockComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
 

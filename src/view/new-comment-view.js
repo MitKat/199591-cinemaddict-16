@@ -3,7 +3,7 @@ import SmartView from './smart-view.js';
 const createNewCommentTemplate = (_data) => {
   const {smile, message} = _data;
   const emojiImage = smile !== ''
-    ? `<img src="./images/emoji/${smile}.png" width="55" height="55" alt="${smile}">`
+    ? `<img src="./images/emoji/${smile}.png"  width="55" height="55" alt="${smile}">`
     : '';
 
   const comment = message !== ''

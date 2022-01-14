@@ -3,19 +3,10 @@ import PopupView from '../view/popup-view';
 import NewCommentView from '../view/new-comment-view';
 import CommentsPopupView from '../view/comments-view';
 import {render, RenderPosition, remove, replace} from '../utils/render.js';
+import {nanoid} from 'nanoid';
 
 const siteFooterElement = document.querySelector('.footer');
 const body = document.querySelector('body');
-
-// Идея следующая, мы должны задать структуру для нового комментария,
-//как сюда забрасывать наши данные я не знаю
-const commentNew = {
-  id: ' ',
-  author: 'Black',
-  text: '',
-  emotion: 'sleeping.png',
-  date: ' ',
-};
 
 export default class FilmPresenter {
   #filmContainer = null;
@@ -26,6 +17,8 @@ export default class FilmPresenter {
   #popupComponent = null;
   #popupCommentsComponent = null;
   #popupNewCommentComponent = null;
+
+  #popupScrollPosition = 0;
 
   constructor (filmContainer, changeData) {
     this.#filmContainer = filmContainer;
@@ -65,6 +58,7 @@ export default class FilmPresenter {
   #removeElementClosePopup = () => {
     body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#popupScrollPosition = 0;
   }
 
   #onEscKeyDown = (evt) => {
@@ -99,23 +93,34 @@ export default class FilmPresenter {
     render(popupComments, this.#popupCommentsComponent, RenderPosition.BEFOREEND);
     render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
 
+    this.#popupComponent.element.scrollTo(0, this.#popupScrollPosition);
 
     const onCtrlEnterKeyDownHandler = (evt) => {
+      const commentNew = {
+        id: nanoid(),
+        text: '',
+        emotion: 'sleeping.png',
+      };
+
       if (evt.ctrlKey && evt.key === 'Enter') {
         evt.preventDefault();
-
-        //удаляем компонент с комментариями
-        remove( this.#popupCommentsComponent);
-
+        this.#savePopupPosition();
         const movieCommentsNewArray = this.#movie.comments.slice();
 
-        movieCommentsNewArray.push(commentNew);
-        this.#changeData({...this.#movie.comments,
-          comments: movieCommentsNewArray
-        });
-        // перерисовываем новые компоненты заново, но тут init ругается
-        render(popupComments, new CommentsPopupView(this.#movie), RenderPosition.BEFOREEND);
-        render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
+        commentNew.text = this.#popupNewCommentComponent.element.querySelector('.film-details__comment-input').value;
+
+        if (commentNew.text !== '') {
+          remove(this.#popupCommentsComponent);
+
+          movieCommentsNewArray.push(commentNew);
+
+          this.#changeData({...this.#movie,
+            comments: movieCommentsNewArray
+          });
+
+          render(popupComments, new CommentsPopupView(this.#movie), RenderPosition.BEFOREEND);
+          render(popupComments, new NewCommentView(), RenderPosition.BEFOREEND);
+        }
       }
     };
 
@@ -137,7 +142,12 @@ export default class FilmPresenter {
     remove(this.#popupComponent);
   }
 
+  #savePopupPosition = () => {
+    this.#popupScrollPosition = this.#popupComponent.element.scrollTop;
+  }
+
   #handleWatchlistClick = () => {
+    this.#savePopupPosition();
     this.#changeData({...this.#movie, userDetails: {
       ...this.#movie.userDetails,
       isWatchlist: !this.#movie.userDetails.isWatchlist
@@ -145,6 +155,7 @@ export default class FilmPresenter {
   }
 
   #handleWatchedClick = () => {
+    this.#savePopupPosition();
     this.#changeData({...this.#movie, userDetails: {
       ...this.#movie.userDetails,
       isAlreadyWatched: !this.#movie.userDetails.isAlreadyWatched
@@ -152,6 +163,7 @@ export default class FilmPresenter {
   }
 
   #handleFavoritesClick = () => {
+    this.#savePopupPosition();
     this.#changeData({...this.#movie, userDetails: {
       ...this.#movie.userDetails,
       isFavorite: !this.#movie.userDetails.isFavorite

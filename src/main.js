@@ -4,13 +4,17 @@ import {generateFilter} from './mock/filter-films.js';
 import MainNavigationView from './view/main-navigation-view.js';
 import ProfileView from './view/profile-view.js';
 import FooterView from './view/footer-view.js';
-
 import FilmListPresenter from './presenter/film-list-presenter.js';
+import MoviesModel from './model/movies-model.js';
+
 
 const FILM_COUNT = 33;
 
 const filmCards = Array.from({length: FILM_COUNT}, (_, i) => generateCardFilm(i+1));
 const filters = generateFilter(filmCards);
+
+const moviesModel = new MoviesModel();
+moviesModel.movies = filmCards;
 
 const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
@@ -20,7 +24,7 @@ render(siteMainElement, new MainNavigationView(filters), RenderPosition.BEFOREBE
 
 render(siteHeaderElement, new ProfileView(filters), RenderPosition.BEFOREEND);
 
-const filmListPresenter = new FilmListPresenter(siteMainElement);
+const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel);
 filmListPresenter.init(filmCards);
 
 render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);
