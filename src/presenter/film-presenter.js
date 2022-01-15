@@ -3,6 +3,7 @@ import PopupView from '../view/popup-view';
 import NewCommentView from '../view/new-comment-view';
 import CommentsPopupView from '../view/comments-view';
 import {render, RenderPosition, remove, replace} from '../utils/render.js';
+import {nanoid} from 'nanoid';
 
 const siteFooterElement = document.querySelector('.footer');
 const body = document.querySelector('body');
@@ -16,6 +17,8 @@ export default class FilmPresenter {
   #popupComponent = null;
   #popupCommentsComponent = null;
   #popupNewCommentComponent = null;
+
+  #popupScrollPosition = 0;
 
   constructor (filmContainer, changeData) {
     this.#filmContainer = filmContainer;
@@ -55,6 +58,7 @@ export default class FilmPresenter {
   #removeElementClosePopup = () => {
     body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#popupScrollPosition = 0;
   }
 
   #onEscKeyDown = (evt) => {
@@ -89,6 +93,42 @@ export default class FilmPresenter {
     render(popupComments, this.#popupCommentsComponent, RenderPosition.BEFOREEND);
     render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
 
+    this.#popupComponent.element.scrollTo(0, this.#popupScrollPosition);
+
+    const onCtrlEnterKeyDownHandler = (evt) => {
+      const commentNew = {
+        id: nanoid(),
+        text: '',
+        emotion: 'sleeping.png',
+      };
+
+      if (evt.ctrlKey && evt.key === 'Enter') {
+        evt.preventDefault();
+        this.#savePopupPosition();
+
+        const movieCommentsNewArray = this.#movie.comments.slice();
+
+        commentNew.text = this.#popupNewCommentComponent._data.message;
+        commentNew.emotion =  `${this.#popupNewCommentComponent._data.smile}.png`;
+
+        if (commentNew.text !== '') {
+          remove(this.#popupCommentsComponent);
+
+          movieCommentsNewArray.push(commentNew);
+
+          this.#changeData({...this.#movie,
+            comments: movieCommentsNewArray
+          });
+
+          render(popupComments, new CommentsPopupView(this.#movie), RenderPosition.BEFOREEND);
+          render(popupComments, new NewCommentView(), RenderPosition.BEFOREEND);
+        }
+      }
+    };
+
+    this.#popupComponent.element.addEventListener('keydown', onCtrlEnterKeyDownHandler);
+
+
     this.#popupComponent.setClosePopupHandler(() => {
       siteFooterElement.removeChild(this.#popupComponent.element);
       this.#removeElementClosePopup();
@@ -104,7 +144,12 @@ export default class FilmPresenter {
     remove(this.#popupComponent);
   }
 
+  #savePopupPosition = () => {
+    this.#popupScrollPosition = this.#popupComponent.element.scrollTop;
+  }
+
   #handleWatchlistClick = () => {
+    this.#savePopupPosition();
     this.#changeData({...this.#movie, userDetails: {
       ...this.#movie.userDetails,
       isWatchlist: !this.#movie.userDetails.isWatchlist
@@ -112,6 +157,7 @@ export default class FilmPresenter {
   }
 
   #handleWatchedClick = () => {
+    this.#savePopupPosition();
     this.#changeData({...this.#movie, userDetails: {
       ...this.#movie.userDetails,
       isAlreadyWatched: !this.#movie.userDetails.isAlreadyWatched
@@ -119,9 +165,11 @@ export default class FilmPresenter {
   }
 
   #handleFavoritesClick = () => {
+    this.#savePopupPosition();
     this.#changeData({...this.#movie, userDetails: {
       ...this.#movie.userDetails,
       isFavorite: !this.#movie.userDetails.isFavorite
     }});
+
   }
 }

@@ -1,4 +1,5 @@
-import AbstractView from './abstract-view.js';
+// import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -113,17 +114,29 @@ const createPopupTemplate = (cardItem) => {
 </section>`;
 };
 
-export default class PopupView extends AbstractView {
+export default class PopupView extends SmartView {
   #cardItem = null;
+  #scrollTop = 0;
 
   constructor(cardItem) {
     super();
     this.#cardItem = cardItem;
+
+    this.element.addEventListener('scroll', this.#onScroll);
   }
 
   get template() {
     return createPopupTemplate(this.#cardItem);
   }
+
+  #onScroll = (evt) => {
+    this.#scrollTop = evt.target.scrollTop;
+  }
+
+  restoreHandlers = () => {
+    this.element.scrollTo(0, this.#scrollTop);
+    this.element.addEventListener('scroll', this.#onScroll);
+  };
 
   setClosePopupHandler = (callback) => {
     this._callback.popupCLoseCLick = callback;
@@ -162,7 +175,10 @@ export default class PopupView extends AbstractView {
 
   #favoritesClickPopupHandler = (evt) => {
     evt.preventDefault();
+    window.scrollTo(0, this.#scrollTop);
+
     this._callback.clickPopupFavorites();
+
   }
 
 }
