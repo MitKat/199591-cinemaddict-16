@@ -25,6 +25,6 @@ render(siteMainElement, new MainNavigationView(filters), RenderPosition.BEFOREBE
 render(siteHeaderElement, new ProfileView(filters), RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel);
-filmListPresenter.init(filmCards);
+filmListPresenter.init();
 
 render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);

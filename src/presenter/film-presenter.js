@@ -3,6 +3,7 @@ import PopupView from '../view/popup-view';
 import NewCommentView from '../view/new-comment-view';
 import CommentsPopupView from '../view/comments-view';
 import {render, RenderPosition, remove, replace} from '../utils/render.js';
+import {UserAction, UpdateType} from '../utils/const.js';
 import {nanoid} from 'nanoid';
 
 const siteFooterElement = document.querySelector('.footer');
@@ -116,9 +117,11 @@ export default class FilmPresenter {
 
           movieCommentsNewArray.push(commentNew);
 
-          this.#changeData({...this.#movie,
-            comments: movieCommentsNewArray
-          });
+          this.#changeData(
+            UserAction.UPDATE_FILM,
+            UpdateType.MINOR,
+            {...this.#movie, comments: movieCommentsNewArray}
+          );
 
           render(popupComments, new CommentsPopupView(this.#movie), RenderPosition.BEFOREEND);
           render(popupComments, new NewCommentView(), RenderPosition.BEFOREEND);
@@ -149,27 +152,43 @@ export default class FilmPresenter {
   }
 
   #handleWatchlistClick = () => {
-    this.#savePopupPosition();
-    this.#changeData({...this.#movie, userDetails: {
-      ...this.#movie.userDetails,
-      isWatchlist: !this.#movie.userDetails.isWatchlist
-    }});
+    if (this.#popupComponent) {
+      this.#savePopupPosition();
+    }
+
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
+      {...this.#movie, userDetails: {
+        ...this.#movie.userDetails,
+        isWatchlist: !this.#movie.userDetails.isWatchlist
+      }});
   }
 
   #handleWatchedClick = () => {
-    this.#savePopupPosition();
-    this.#changeData({...this.#movie, userDetails: {
-      ...this.#movie.userDetails,
-      isAlreadyWatched: !this.#movie.userDetails.isAlreadyWatched
-    }});
+    if (this.#popupComponent) {
+      this.#savePopupPosition();
+    }
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
+      {...this.#movie, userDetails: {
+        ...this.#movie.userDetails,
+        isAlreadyWatched: !this.#movie.userDetails.isAlreadyWatched
+      }});
   }
 
   #handleFavoritesClick = () => {
-    this.#savePopupPosition();
-    this.#changeData({...this.#movie, userDetails: {
-      ...this.#movie.userDetails,
-      isFavorite: !this.#movie.userDetails.isFavorite
-    }});
+    if (this.#popupComponent) {
+      this.#savePopupPosition();
+    }
+    this.#changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
+      {...this.#movie, userDetails: {
+        ...this.#movie.userDetails,
+        isFavorite: !this.#movie.userDetails.isFavorite
+      }});
 
   }
 }
