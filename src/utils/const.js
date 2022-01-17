@@ -18,7 +18,7 @@ export const UpdateType = {
 
 export const FilterType = {
   ALL: 'all',
-  WACHLIST: 'wachlist',
+  WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
 };

@@ -7,6 +7,7 @@ import FilmPresenter from './film-presenter';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {SortType, UpdateType, UserAction} from '../utils/const';
 import {sortDateFunction, sortRatingFunction} from '../utils/common';
+import {filter} from '../utils/filter.js';
 
 const FILM_COUNT_STEP = 5;
 
@@ -22,26 +23,33 @@ export default class FilmListPresenter {
     #renderedFilmCount = FILM_COUNT_STEP;
     #sortingComponent = null;
     #moviesModel = null;
+    #filterModel = null;
 
 
     #filmPresenter = new Map();
 
-    constructor (filmListContainer, moviesModel) {
+    constructor (filmListContainer, moviesModel, filterModel) {
       this.#filmListContainer = filmListContainer;
       this.#moviesModel = moviesModel;
+      this.#filterModel = filterModel;
 
       this.#moviesModel.addObserver(this.#handleModelEvent);
+      this.#filterModel.addObserver(this.#handleModelEvent);
     }
 
     get films() {
+      const filterType = this.#filterModel.filter;
+      const films = this.#moviesModel.movies;
+      const filteredMovies = filter[filterType](films);
+
       switch (this.#currentSortType) {
         case SortType.DATE:
-          return [...this.#moviesModel.movies].sort(sortDateFunction);
+          return filteredMovies.sort(sortDateFunction);
         case SortType.RATING:
-          return [...this.#moviesModel.movies].sort(sortRatingFunction);
+          return filteredMovies.sort(sortRatingFunction);
       }
 
-      return this.#moviesModel.movies;
+      return filteredMovies;
     }
 
     init = () => {
@@ -144,7 +152,7 @@ export default class FilmListPresenter {
     }
 
     #handleViewAction = (actionType, updateType, update) => {
-      console.log(actionType, updateType, update);
+      // console.log(actionType, updateType, update);
       switch (actionType) {
         case UserAction.UPDATE_FILM:
           this.#moviesModel.updateFilm(updateType, update);
@@ -159,7 +167,7 @@ export default class FilmListPresenter {
     }
 
     #handleModelEvent = (updateType, data) => {
-      console.log(updateType, data);
+      // console.log(updateType, data);
       switch (updateType) {
         case UpdateType.PATCH:
           // - обновить часть списка (например, когда поменялось описание)

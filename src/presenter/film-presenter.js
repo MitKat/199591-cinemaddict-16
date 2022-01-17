@@ -119,7 +119,7 @@ export default class FilmPresenter {
 
           this.#changeData(
             UserAction.UPDATE_FILM,
-            UpdateType.MINOR,
+            UpdateType.PATCH,
             {...this.#movie, comments: movieCommentsNewArray}
           );
 
@@ -154,15 +154,24 @@ export default class FilmPresenter {
   #handleWatchlistClick = () => {
     if (this.#popupComponent) {
       this.#savePopupPosition();
+      this.#changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
+        {...this.#movie, userDetails: {
+          ...this.#movie.userDetails,
+          isWatchlist: !this.#movie.userDetails.isWatchlist
+        }});
+    } else {
+      this.#changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.MINOR,
+        {...this.#movie, userDetails: {
+          ...this.#movie.userDetails,
+          isWatchlist: !this.#movie.userDetails.isWatchlist
+        }});
+
     }
 
-    this.#changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
-      {...this.#movie, userDetails: {
-        ...this.#movie.userDetails,
-        isWatchlist: !this.#movie.userDetails.isWatchlist
-      }});
   }
 
   #handleWatchedClick = () => {
@@ -171,7 +180,7 @@ export default class FilmPresenter {
     }
     this.#changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {
         ...this.#movie.userDetails,
         isAlreadyWatched: !this.#movie.userDetails.isAlreadyWatched
@@ -184,7 +193,7 @@ export default class FilmPresenter {
     }
     this.#changeData(
       UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
+      UpdateType.MINOR,
       {...this.#movie, userDetails: {
         ...this.#movie.userDetails,
         isFavorite: !this.#movie.userDetails.isFavorite
