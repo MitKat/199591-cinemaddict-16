@@ -43,4 +43,15 @@ export default class CommentsPopupView extends AbstractView {
   get template() {
     return createCommentsPopupTemplate(this.#film);
   }
+
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelectorAll('.film-details__comment-delete')
+      .forEach((comment) => comment.addEventListener('click', (evt) => this.#commentDeleteClickHandler(evt, this.#film.id, comment.id)));
+  }
+
+  #commentDeleteClickHandler = (evt, filmId, commentId) => {
+    evt.preventDefault();
+    this._callback.deleteClick(filmId, commentId);
+  }
 }

@@ -8,7 +8,7 @@ import CommentsPopupView from '../view/comments-view';
 import NoFilmsView from '../view/no-films-view';
 import FilmPresenter from './film-presenter.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
-import {SortType, UpdateType, UserAction} from '../utils/const';
+import {FilterType, SortType, UpdateType, UserAction} from '../utils/const';
 import {sortDateFunction, sortRatingFunction} from '../utils/common';
 import {filter} from '../utils/filter.js';
 import {nanoid} from 'nanoid';
@@ -21,7 +21,7 @@ export default class FilmListPresenter {
   #filmListContainer = null;
   #filmsBlockComponent = new FilmsBlockView();
   #filmsListComponent = new FilmsListView();
-  #noFilmsComponent = new NoFilmsView();
+  #noFilmsComponent = null;
   #buttonShowMoreComponent = null;
   #sortingComponent = null;
   #popupComponent = null;
@@ -30,6 +30,7 @@ export default class FilmListPresenter {
 
   #currentSortType = SortType.DEFAULT;
   #renderedFilmCount = FILM_COUNT_STEP;
+  #filterType = FilterType.ALL;
   #popupScrollPosition = 0;
 
   #moviesModel = null;
@@ -47,9 +48,9 @@ export default class FilmListPresenter {
   }
 
   get films() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const films = this.#moviesModel.movies;
-    const filteredMovies = filter[filterType](films);
+    const filteredMovies = filter[this.#filterType](films);
 
     switch (this.#currentSortType) {
       case SortType.DATE:
@@ -67,7 +68,11 @@ export default class FilmListPresenter {
       this.#renderFilmList(this.films);
     }
 
+    #findFilmById = (filmId) => this.#moviesModel.movies.find((film) => film.id === filmId)
+
     #renderNoFilms = () => {
+      this.#noFilmsComponent = new NoFilmsView(this.#filterType);
+      remove(this.#sortingComponent);
       render(this.#filmsListComponent, this.#noFilmsComponent, RenderPosition.BEFOREEND);
     }
 
@@ -110,13 +115,11 @@ export default class FilmListPresenter {
     }
 
     #renderPopup = (filmId) => {
-      const filmItem = this.films[filmId-1];
+      const filmItem = this.#findFilmById(filmId);
 
-      this.#popupComponent = new PopupView(this.films[filmId-1]);
-      this.#popupCommentsComponent = new CommentsPopupView(this.films[filmId-1]);
+      this.#popupComponent = new PopupView(filmItem);
+      this.#popupCommentsComponent = new CommentsPopupView(filmItem);
       this.#popupNewCommentComponent = new NewCommentView();
-      console.log(this.#popupScrollPosition);
-      this.#popupComponent.element.scrollTo(0, this.#popupScrollPosition);
 
       body.classList.add('hide-overflow');
       const popupFilmPrevious = siteFooterElement.querySelector('.film-details');
@@ -132,6 +135,8 @@ export default class FilmListPresenter {
       const popupComments = this.#popupComponent.element.querySelector('.film-details__bottom-container');
       render(popupComments, this.#popupCommentsComponent, RenderPosition.BEFOREEND);
       render(popupComments, this.#popupNewCommentComponent, RenderPosition.BEFOREEND);
+
+      this.#popupCommentsComponent.setDeleteClickHandler(this.#handleDeleteClickComment);
 
       const onCtrlEnterKeyDownHandler = (evt) => {
         const commentNew = {
@@ -149,9 +154,6 @@ export default class FilmListPresenter {
           commentNew.emotion =  `${this.#popupNewCommentComponent._data.smile}.png`;
 
           if (commentNew.text !== '' && commentNew.emotion !== '') {
-            remove(this.#popupCommentsComponent);
-            remove(this.#popupNewCommentComponent);
-
             movieCommentsNewArray.push(commentNew);
 
             this.#handleViewAction(
@@ -160,9 +162,6 @@ export default class FilmListPresenter {
               {...filmItem, comments: movieCommentsNewArray}
             );
           }
-
-          render(popupComments, new CommentsPopupView(this.films[filmId-1]), RenderPosition.BEFOREEND);
-          render(popupComments, new NewCommentView(), RenderPosition.BEFOREEND);
         }
       };
 
@@ -177,43 +176,59 @@ export default class FilmListPresenter {
       this.#popupComponent.setClickButtonPopupWatched(this.#handleWatchedClick);
       this.#popupComponent.setClickButtonPopupFavorites(this.#handleFavoritesClick);
 
+      this.#popupComponent.element.scroll(0, this.#popupScrollPosition);
+    }
+
+    #handleDeleteClickComment = (filmId, commentId) => {
+      const filmItem = this.#findFilmById(filmId);
+
+      const oldComment = filmItem.comments.find((comment) => comment.id === commentId);
+      console.log(filmItem.comments.commentId);
+
+      this.#handleViewAction(
+        UserAction.DELETE_COMMENT,
+        UpdateType.MINOR,
+        oldComment,
+      );
     }
 
     #handleWatchlistClick = (filmId) => {
+      const filmItem = this.#findFilmById(filmId);
       this.#savePopupPosition();
+
       this.#handleViewAction(
         UserAction.UPDATE_FILM,
         UpdateType.MINOR,
-        {...this.films[filmId-1], userDetails: {
-          ...this.films[filmId-1].userDetails,
-          isWatchlist: !this.films[filmId-1].userDetails.isWatchlist
+        {...filmItem, userDetails: {
+          ...filmItem.userDetails,
+          isWatchlist: !filmItem.userDetails.isWatchlist
         }});
-
-      this.#renderPopup(filmId);
     }
 
     #handleWatchedClick = (filmId) => {
+      const filmItem = this.#findFilmById(filmId);
       this.#savePopupPosition();
+
       this.#handleViewAction(
         UserAction.UPDATE_FILM,
         UpdateType.MINOR,
-        {...this.films[filmId-1], userDetails: {
-          ...this.films[filmId-1].userDetails,
-          isAlreadyWatched: !this.films[filmId-1].userDetails.isAlreadyWatched
+        {...filmItem, userDetails: {
+          ...filmItem.userDetails,
+          isAlreadyWatched: !filmItem.userDetails.isAlreadyWatched
         }});
-      this.#renderPopup(filmId);
     }
 
     #handleFavoritesClick = (filmId) => {
+      const filmItem = this.#findFilmById(filmId);
       this.#savePopupPosition();
+
       this.#handleViewAction(
         UserAction.UPDATE_FILM,
         UpdateType.MINOR,
-        {...this.films[filmId-1], userDetails: {
-          ...this.films[filmId-1].userDetails,
-          isFavorite: !this.films[filmId-1].userDetails.isFavorite
+        {...filmItem, userDetails: {
+          ...filmItem.userDetails,
+          isFavorite: !filmItem.userDetails.isFavorite
         }});
-      this.#renderPopup(filmId);
     }
 
     #handlerButtonShowClick = () => {
@@ -248,7 +263,8 @@ export default class FilmListPresenter {
 
     #renderFilmList = () => {
       const filmCount = this.films.length;
-      const films = this.films.slice(0, FILM_COUNT_STEP);
+
+      const films = this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount));
 
       if (filmCount === 0) {
         this.#renderNoFilms();
@@ -264,10 +280,15 @@ export default class FilmListPresenter {
 
     #clearFilmList = ({resetRenderedFilmCount = false, resetSortType = false} = {}) => {
       const filmCount = this.films.length;
+
       this.#filmPresenter.forEach((presenter) => presenter.destroy());
       this.#filmPresenter.clear();
-      remove(this.#noFilmsComponent);
+      remove(this.#sortingComponent);
       remove(this.#buttonShowMoreComponent);
+
+      if (this.#noFilmsComponent) {
+        remove(this.#noFilmsComponent);
+      }
 
       if (resetRenderedFilmCount) {
         this.#renderedFilmCount = FILM_COUNT_STEP;
@@ -281,32 +302,37 @@ export default class FilmListPresenter {
     }
 
         #handleViewAction = (actionType, updateType, update) => {
-          console.log(actionType, updateType, update);
+          // console.log(actionType, updateType, update);
 
           switch (actionType) {
             case UserAction.UPDATE_FILM:
               this.#moviesModel.updateFilm(updateType, update);
               break;
-            case UserAction.ADD_FILM:
-              this.#moviesModel.addFilm(updateType, update);
-              break;
-            case UserAction.DELETE_FILM:
-              this.#moviesModel.deleteFilm(updateType, update);
+            case UserAction.DELETE_COMMENT:
+              this.#moviesModel.deleteComment(updateType, update);
               break;
           }
         }
 
         #handleModelEvent = (updateType, data) => {
-          console.log(updateType, data);
+          // console.log(updateType, data);
 
           switch (updateType) {
+            case UpdateType.PATCH:
+              this.#clearFilmList();
+              this.#renderSort();
+              this.#renderFilmList();
+              break;
             case UpdateType.MINOR:
               this.#clearFilmList();
+              this.#renderSort();
               this.#renderFilmList();
+              this.#renderPopup(data.id);
               break;
             case UpdateType.MAJOR:
               // - обновить всю доску (например, при переключении фильтра)
               this.#clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
+              this.#renderSort();
               this.#renderFilmList();
               break;
           }
