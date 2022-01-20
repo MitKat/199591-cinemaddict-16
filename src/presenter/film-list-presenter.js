@@ -183,7 +183,7 @@ export default class FilmListPresenter {
       const filmItem = this.#findFilmById(filmId);
 
       const oldComment = filmItem.comments.find((comment) => comment.id === commentId);
-      console.log(filmItem.comments.commentId);
+      // console.log(filmItem.comments.commentId);
 
       this.#handleViewAction(
         UserAction.DELETE_COMMENT,
