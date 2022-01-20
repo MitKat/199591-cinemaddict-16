@@ -40,7 +40,7 @@ export default class MoviesModel extends AbstractObservable {
     const index = this.#movies.findIndex((film) => film.id === update.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
+      throw new Error('Can\'t delete unexisting film');
     }
 
     this.#movies = [

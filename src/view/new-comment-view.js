@@ -66,10 +66,10 @@ export default class NewCommentView extends SmartView {
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#descriptionInputHandler);
+
     this.element.querySelectorAll('.film-details__emoji-item')
       .forEach((emotion) => emotion.addEventListener('click', this.#clickEmojiHandler));
   }
-
 
   #clickEmojiHandler = (evt) => {
     evt.preventDefault();

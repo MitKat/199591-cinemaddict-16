@@ -133,17 +133,20 @@ export default class PopupView extends SmartView {
 
   setClickButtonPopupWatchlist = (callback) => {
     this._callback.clickPopupWatchlist = callback;
-    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#watchlistClickPopupHandler);
+    this.element.querySelector('.film-details__control-button--watchlist')
+      .addEventListener('click', (evt) => this.#watchlistClickPopupHandler(evt, this.#cardItem.id));
   }
 
   setClickButtonPopupWatched = (callback) => {
     this._callback.clickPopupWatched = callback;
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickPopupHandler);
+    this.element.querySelector('.film-details__control-button--watched')
+      .addEventListener('click', (evt) =>  this.#watchedClickPopupHandler(evt, this.#cardItem.id));
   }
 
   setClickButtonPopupFavorites = (callback) => {
     this._callback.clickPopupFavorites = callback;
-    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoritesClickPopupHandler);
+    this.element.querySelector('.film-details__control-button--favorite')
+      .addEventListener('click', (evt) => this.#favoritesClickPopupHandler(evt, this.#cardItem.id));
   }
 
   #popupCloseHandler = (evt) => {
@@ -151,19 +154,19 @@ export default class PopupView extends SmartView {
     this._callback.popupCLoseCLick();
   }
 
-  #watchlistClickPopupHandler = (evt) => {
+  #watchlistClickPopupHandler = (evt, id) => {
     evt.preventDefault();
-    this._callback.clickPopupWatchlist();
+    this._callback.clickPopupWatchlist(id);
   }
 
-  #watchedClickPopupHandler = (evt) => {
+  #watchedClickPopupHandler = (evt, id) => {
     evt.preventDefault();
-    this._callback.clickPopupWatched();
+    this._callback.clickPopupWatched(id);
   }
 
-  #favoritesClickPopupHandler = (evt) => {
+  #favoritesClickPopupHandler = (evt, id) => {
     evt.preventDefault();
-    this._callback.clickPopupFavorites();
+    this._callback.clickPopupFavorites(id);
   }
 
 }
