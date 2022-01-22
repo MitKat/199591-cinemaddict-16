@@ -1,4 +1,4 @@
-import SmartView from "./smart-view.js";
+import SmartView from './smart-view.js';
 
 const createStatisticTemplate = () => (
   `<section class="statistic">
