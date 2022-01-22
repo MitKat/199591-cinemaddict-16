@@ -1,7 +1,7 @@
 import AbstractView from './abstract-view.js';
 
 const createCommentItemTemplate = (comment) => {
-  const {author, text, date, emotion} = comment;
+  const {id, author, text, date, emotion} = comment;
 
   return `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
@@ -12,7 +12,7 @@ const createCommentItemTemplate = (comment) => {
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${date}</span>
-      <button class="film-details__comment-delete">Delete</button>
+      <button class="film-details__comment-delete" value="${id}">Delete</button>
     </p>
   </div>
 </li>`;
@@ -34,6 +34,7 @@ const createCommentsPopupTemplate = (film) => {
 
 export default class CommentsPopupView extends AbstractView {
   #film = null;
+  #commentId = '';
 
   constructor(film) {
     super();
@@ -47,11 +48,12 @@ export default class CommentsPopupView extends AbstractView {
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
     this.element.querySelectorAll('.film-details__comment-delete')
-      .forEach((comment) => comment.addEventListener('click', (evt) => this.#commentDeleteClickHandler(evt, this.#film.id, comment.id)));
+      .forEach((comment) => comment.addEventListener('click', (evt) => this.#commentDeleteClickHandler(evt, this.#film.id, this.#commentId)));
   }
 
   #commentDeleteClickHandler = (evt, filmId, commentId) => {
     evt.preventDefault();
+    commentId = evt.target.value;
     this._callback.deleteClick(filmId, commentId);
   }
 }

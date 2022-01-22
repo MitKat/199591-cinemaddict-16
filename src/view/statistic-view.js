@@ -1,4 +1,6 @@
-export const createStatisticTemplate = () => (
+import SmartView from "./smart-view.js";
+
+const createStatisticTemplate = () => (
   `<section class="statistic">
   <p class="statistic__rank">
     Your rank
@@ -40,12 +42,15 @@ export const createStatisticTemplate = () => (
     </li>
   </ul>
 
-  <!-- Пример диаграммы -->
-  <img src="images/cinemaddict-stats-markup.png" alt="Пример диаграммы">
-
   <div class="statistic__chart-wrap">
     <canvas class="statistic__chart" width="1000"></canvas>
   </div>
 
 </section>`
 );
+
+export default class StatisticView extends SmartView {
+  get template() {
+    return createStatisticTemplate();
+  }
+}

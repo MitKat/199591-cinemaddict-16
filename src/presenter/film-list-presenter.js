@@ -156,11 +156,7 @@ export default class FilmListPresenter {
           if (commentNew.text !== '' && commentNew.emotion !== '') {
             movieCommentsNewArray.push(commentNew);
 
-            this.#handleViewAction(
-              UserAction.UPDATE_FILM,
-              UpdateType.MINOR,
-              {...filmItem, comments: movieCommentsNewArray}
-            );
+            this.#updateCommentsArray(filmItem, movieCommentsNewArray);
           }
         }
       };
@@ -179,17 +175,26 @@ export default class FilmListPresenter {
       this.#popupComponent.element.scroll(0, this.#popupScrollPosition);
     }
 
-    #handleDeleteClickComment = (filmId, commentId) => {
-      const filmItem = this.#findFilmById(filmId);
-
-      const oldComment = filmItem.comments.find((comment) => comment.id === commentId);
-      // console.log(filmItem.comments.commentId);
-
+    #updateCommentsArray = (filmItem, movieCommentsNewArray) => {
       this.#handleViewAction(
-        UserAction.DELETE_COMMENT,
+        UserAction.UPDATE_FILM,
         UpdateType.MINOR,
-        oldComment,
+        {...filmItem, comments: movieCommentsNewArray}
       );
+    }
+
+    #handleDeleteClickComment = (filmId, commentId) => {
+      this.#savePopupPosition();
+      remove(this.#popupCommentsComponent);
+      const filmItem = this.#findFilmById(filmId);
+      const {comments} = filmItem;
+      const oldCommentIndex = comments.findIndex((comment) => comment.id === commentId);
+
+      const movieCommentsNewArray = [
+        ...comments.slice(0, oldCommentIndex),
+        ...comments.slice(oldCommentIndex + 1),
+      ];
+      this.#updateCommentsArray(filmItem, movieCommentsNewArray);
     }
 
     #handleWatchlistClick = (filmId) => {

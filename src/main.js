@@ -7,6 +7,7 @@ import FilmListPresenter from './presenter/film-list-presenter.js';
 import MoviesModel from './model/movies-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
+import StatisticView from './view/statistic-view.js';
 
 
 const FILM_COUNT = 33;
@@ -34,5 +35,9 @@ render(siteHeaderElement, new ProfileView(FILM_COUNT), RenderPosition.BEFOREEND)
 
 const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
 filmListPresenter.init();
+
+const statisticComponent = new StatisticView();
+
+render(siteMainElement, statisticComponent, RenderPosition.BEFOREBEGIN);
 
 render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);
