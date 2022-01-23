@@ -26,7 +26,7 @@ const emoji = [
 ];
 let commentId =1;
 
-const getNextId = () => commentId++;
+const generateCommentId = () => String(commentId++);
 
 const generateCommentDate = () => {
   const maxDays = 30;
@@ -37,7 +37,7 @@ const generateCommentDate = () => {
 
 export const generateComment = () => (
   {
-    id: getNextId(),
+    id: generateCommentId(),
     author: authors[getRandomInteger(0, authors.length - 1)],
     text: phrases[getRandomInteger(1, phrases.length - 1)],
     emotion: emoji[getRandomInteger(1, emoji.length - 1)],

@@ -1,4 +1,5 @@
 import SmartView from './smart-view.js';
+import he from 'he';
 
 const createNewCommentTemplate = (_data) => {
   const {smile, message} = _data;
@@ -16,7 +17,7 @@ const createNewCommentTemplate = (_data) => {
      </div>
 
      <label class="film-details__comment-label">
-       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${comment}</textarea>
+       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(comment)}</textarea>
      </label>
 
      <div class="film-details__emoji-list">
@@ -66,10 +67,10 @@ export default class NewCommentView extends SmartView {
 
   #setInnerHandlers = () => {
     this.element.querySelector('.film-details__comment-input').addEventListener('input', this.#descriptionInputHandler);
+
     this.element.querySelectorAll('.film-details__emoji-item')
       .forEach((emotion) => emotion.addEventListener('click', this.#clickEmojiHandler));
   }
-
 
   #clickEmojiHandler = (evt) => {
     evt.preventDefault();
