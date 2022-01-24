@@ -1,7 +1,88 @@
 import SmartView from './smart-view.js';
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {GENRE, FilterType} from '../utils/const.js';
+import {filter} from '../utils/filter.js';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
-const createStatisticTemplate = () => (
-  `<section class="statistic">
+const BAR_HEIGHT = 50;
+
+const renderDiagramChart = (statisticCtx, genreStat) => {
+  statisticCtx.height = BAR_HEIGHT * GENRE.length;
+
+  return new Chart(statisticCtx, {
+    plugins: [ChartDataLabels],
+    type: 'horizontalBar',
+    data: {
+      labels: GENRE,
+      datasets: [{
+        data: genreStat,
+        backgroundColor: '#ffe800',
+        hoverBackgroundColor: '#ffe800',
+        anchor: 'start',
+        barThickness: 24,
+      }],
+    },
+    options: {
+      responsive: false,
+      plugins: {
+        datalabels: {
+          font: {
+            size: 20,
+          },
+          color: '#ffffff',
+          anchor: 'start',
+          align: 'start',
+          offset: 40,
+        },
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: '#ffffff',
+            padding: 100,
+            fontSize: 20,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+      },
+      legend: {
+        display: false,
+      },
+      tooltips: {
+        enabled: false,
+      },
+    },
+  });
+};
+
+const createStatisticTemplate = (watchedMovies, topGenre) => {
+
+  const statWatched = watchedMovies.length;
+
+  const statTimeWatched = watchedMovies.map((film) => film.filmInfo.runTime).reduce((prevValue, curValue) => prevValue + curValue);
+  const hours = Math.floor(dayjs.duration(statTimeWatched, 'minutes').asHours(statTimeWatched));
+  const minutes = dayjs.duration(statTimeWatched, 'minutes').minutes(statTimeWatched);
+  const timeDuration = (hours===0)
+    ? `${minutes}<span class="statistic__item-description">m</span>`
+    : `${hours}<span class="statistic__item-description">h</span> ${minutes}<span class="statistic__item-description">m</span>`;
+
+  return `<section class="statistic">
   <p class="statistic__rank">
     Your rank
     <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
@@ -30,15 +111,15 @@ const createStatisticTemplate = () => (
   <ul class="statistic__text-list">
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">You watched</h4>
-      <p class="statistic__item-text">28 <span class="statistic__item-description">movies</span></p>
+      <p class="statistic__item-text">${statWatched} <span class="statistic__item-description">movies</span></p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Total duration</h4>
-      <p class="statistic__item-text">69 <span class="statistic__item-description">h</span> 41 <span class="statistic__item-description">m</span></p>
+      <p class="statistic__item-text">${timeDuration}</p>
     </li>
     <li class="statistic__text-item">
       <h4 class="statistic__item-title">Top genre</h4>
-      <p class="statistic__item-text">Drama</p>
+      <p class="statistic__item-text">${topGenre}</p>
     </li>
   </ul>
 
@@ -46,11 +127,46 @@ const createStatisticTemplate = () => (
     <canvas class="statistic__chart" width="1000"></canvas>
   </div>
 
-</section>`
-);
+</section>`;
+};
 
 export default class StatisticView extends SmartView {
-  get template() {
-    return createStatisticTemplate();
+  #movies = null;
+  #topGenre = '';
+  #genreStat = [];
+  #watchedMovies = [];
+
+  constructor(movies) {
+    super();
+    this.#movies = movies;
+    this.#watchedMovies = filter[FilterType.HISTORY](movies);
+    // watchedMovies.filter((movie) => movie.userDetails.watchingDate)
+
+    const findGenre = (film, genre) => film.filmInfo.genre.find((filmGenre) => filmGenre === genre);
+    this.#genreStat = GENRE.map((genre) => movies.filter((film) => findGenre(film, genre) === genre).length);
+    const maxGenreStat = Math.max.apply(null, this.#genreStat);
+    const topGenreIndex = this.#genreStat.findIndex((genre) => genre === maxGenreStat);
+    this.#topGenre = GENRE[topGenreIndex];
+
+    this.#setCharts();
   }
+
+  get template() {
+    return createStatisticTemplate(this.#watchedMovies, this.#topGenre);
+  }
+
+  removeElement = () => {
+    super.removeElement();
+  }
+
+  restoreHandlers = () => {
+    this.#setCharts();
+  }
+
+  #setCharts = () => {
+    const statisticCtx = this.element.querySelector('.statistic__chart');
+    renderDiagramChart(statisticCtx, this.#genreStat);
+  }
+
+
 }

@@ -1,4 +1,5 @@
 import AbstractView from './abstract-view.js';
+import {NavigationType} from '../utils/const.js';
 
 const createFilterItemTemplate = (filter, currentFilterType) => {
   const {type, name, count} = filter;
@@ -40,7 +41,7 @@ export default class FilterView extends AbstractView {
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
     this.element.querySelectorAll('.main-navigation__item')
-      .forEach((item) => item.addEventListener('click', this.#filterTypeChangeHandler));
+      .forEach((item) => item.addEventListener('click', (evt) => this.#filterTypeChangeHandler(evt, NavigationType.FILM_LIST)));
   }
 
   #filterTypeChangeHandler = (evt) => {

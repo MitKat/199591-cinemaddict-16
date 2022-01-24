@@ -1,5 +1,6 @@
 import {render, RenderPosition} from './utils/render.js';
 import {generateCardFilm} from './mock/film-card.js';
+import {NavigationType} from './utils/const.js';
 import MainNavigationView from './view/main-navigation-view.js';
 import ProfileView from './view/profile-view.js';
 import FooterView from './view/footer-view.js';
@@ -23,21 +24,44 @@ const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
-render(siteMainElement, new MainNavigationView(), RenderPosition.BEFOREBEGIN);
+const mainNavigationComponent = new MainNavigationView();
+
+render(siteMainElement, mainNavigationComponent, RenderPosition.BEFOREBEGIN);
 
 const filterContainer = document.querySelector('.main-navigation');
 
 const filterPresenter = new FilterPresenter(filterContainer, filterModel, moviesModel);
 
-filterPresenter.init();
 
 render(siteHeaderElement, new ProfileView(FILM_COUNT), RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
-filmListPresenter.init();
 
-const statisticComponent = new StatisticView();
+
+const statisticComponent = new StatisticView(filmCards);
 
 render(siteMainElement, statisticComponent, RenderPosition.BEFOREBEGIN);
+
+const handleNavigationClick = (type) => {
+  switch (type) {
+    case NavigationType.FILM_LIST:
+      statisticComponent.removeElement();
+      filmListPresenter.init();
+
+
+      break;
+    case NavigationType.STATISTIC:
+      filmListPresenter.destroy();
+      render(siteMainElement, statisticComponent, RenderPosition.BEFOREBEGIN);
+      break;
+  }
+};
+
+mainNavigationComponent.setNavigationClickHandler(handleNavigationClick);
+
+filterPresenter.init();
+
+filmListPresenter.init();
+
 
 render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);

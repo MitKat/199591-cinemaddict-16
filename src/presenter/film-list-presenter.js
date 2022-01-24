@@ -68,6 +68,10 @@ export default class FilmListPresenter {
       this.#renderFilmList(this.films);
     }
 
+    destroy = () => {
+      this.#clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
+    }
+
     #findFilmById = (filmId) => this.#moviesModel.movies.find((film) => film.id === filmId)
 
     #renderNoFilms = () => {

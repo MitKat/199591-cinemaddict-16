@@ -29,12 +29,15 @@ const alternativeTitles = [
   'The Great Flamarion',
 ];
 const genres = [
-  'Musical',
-  'Comedy',
-  'Mystery',
   'Drama',
-  'Cartoon',
-  'Western',
+  'Thriller',
+  'Animation',
+  'Adventure',
+  'Family',
+  'Sci-Fi',
+  'Action',
+  'Horror',
+  'Comedy',
 ];
 const images = [
   './images/posters/made-for-each-other.png',
