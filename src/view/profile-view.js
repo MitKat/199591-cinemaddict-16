@@ -1,16 +1,11 @@
 import AbstractView from './abstract-view.js';
+import {generateProfileRank} from '../utils/common.js';
+import {FilterType} from '../utils/const.js';
+import {filter} from '../utils/filter.js';
 
-const createProfileTemplate = (filter) => {
-  const {history} = filter;
-
-  let profileName = 'Movie Buff';
-  if (history === 0) {
-    profileName = '';
-  } else if (history <= 10) {
-    profileName = 'Novice';
-  } else if (history > 10 && history <= 20) {
-    profileName = 'Fan';
-  }
+const createProfileTemplate = (movies) => {
+  const Item = filter[FilterType.HISTORY](movies);
+  const profileName = generateProfileRank(Item.length);
 
   return (`<section class="header__profile profile">
   <p class="profile__rating">${profileName}</p>
@@ -19,14 +14,14 @@ const createProfileTemplate = (filter) => {
 };
 
 export default class ProfileView extends AbstractView {
-  #filter = null;
+  #moviesModel = null;
 
-  constructor(filter) {
+  constructor(moviesModel) {
     super();
-    this.#filter = filter;
+    this.#moviesModel = moviesModel;
   }
 
   get template() {
-    return createProfileTemplate(this.#filter);
+    return createProfileTemplate(this.#moviesModel);
   }
 }

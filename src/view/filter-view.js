@@ -6,7 +6,8 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
 
   return (
     `<a href="${name}" class= "${type === currentFilterType ?
-      'main-navigation__item main-navigation__item--active' : 'main-navigation__item'}" name=${type}>
+      'main-navigation__item main-navigation__item--active' : 'main-navigation__item'}"
+      name=${type} type=${NavigationType.FILM_LIST}>
       ${name !== 'All movies' ?
       `${name} <span class="main-navigation__item-count">${count}</span>` : `${name}`}
 
@@ -41,7 +42,7 @@ export default class FilterView extends AbstractView {
   setFilterTypeChangeHandler = (callback) => {
     this._callback.filterTypeChange = callback;
     this.element.querySelectorAll('.main-navigation__item')
-      .forEach((item) => item.addEventListener('click', (evt) => this.#filterTypeChangeHandler(evt, NavigationType.FILM_LIST)));
+      .forEach((item) => item.addEventListener('click', this.#filterTypeChangeHandler));
   }
 
   #filterTypeChangeHandler = (evt) => {

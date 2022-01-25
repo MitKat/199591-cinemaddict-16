@@ -3,6 +3,7 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {GENRE, FilterType, StatiscticType} from '../utils/const.js';
 import {filter} from '../utils/filter.js';
+import {generateProfileRank} from '../utils/common.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isBetween from 'dayjs/plugin/isBetween';
@@ -19,16 +20,31 @@ const PERIOD_STAT = {
   YEAR: 1,
 };
 
-const renderDiagramChart = (statisticCtx, genreStat, dateFrom, dateTo, watchedMovies) => {
+const findGenreStatisic = (movies) => {
+  const findGenre = (film, genre) => film.filmInfo.genre.find((filmGenre) => filmGenre === genre);
+  const genreStat = GENRE.map((genre) => movies.filter((film) => findGenre(film, genre) === genre).length);
+
+  return genreStat;
+};
+
+const findTopGenre = (genreStat) => {
+  const maxGenreStat = Math.max.apply(null, genreStat);
+  const topGenreIndex = genreStat.findIndex((genre) => genre === maxGenreStat);
+  const topGenre = GENRE[topGenreIndex];
+
+  return topGenre;
+};
+
+const findMoviesInPeriod = (watchedMovies, dateFrom, dateTo) => {
+  const isWatchedInPeriod = (movie, from, to) => dayjs(movie.userDetails.watchingDate).isBetween(from, to);
+  const moviesInPeriod = watchedMovies.filter((movie) => isWatchedInPeriod(movie, dateFrom, dateTo));
+  return moviesInPeriod;
+};
+
+const renderDiagramChart = (statisticCtx, watchedMovies, dateFrom, dateTo) => {
   statisticCtx.height = BAR_HEIGHT * GENRE.length;
-  // console.log(dateFrom);
-  // console.log(dayjs(watchedMovies[3].userDetails.watchingDate));
-
-  const isWatchedInPeriod = (movie, from, to) => dayjs(movie.userDetails.watchingDate).isBetween(from, to, 'year');
-  // console.log(isWatchedInPeriod);
-
-  const filteredMovies = watchedMovies.filter((movie) => isWatchedInPeriod(movie, dateFrom, dateTo));
-  console.log(filteredMovies);
+  const moviesInPeriod = findMoviesInPeriod(watchedMovies, dateFrom, dateTo);
+  const genreStat = findGenreStatisic(moviesInPeriod);
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
@@ -89,13 +105,26 @@ const renderDiagramChart = (statisticCtx, genreStat, dateFrom, dateTo, watchedMo
   });
 };
 
-const createStatisticTemplate = (watchedMovies, topGenre) => {
+const createStatisticTemplate = (watchedMovies, currentType, dateFrom, dateTo) => {
+  const profileName = generateProfileRank(watchedMovies.length);
+  const moviesInPeriod = findMoviesInPeriod(watchedMovies, dateFrom, dateTo);
 
-  const statWatched = watchedMovies.length;
+  let genreStat = [0];
+  let topGenre = '';
+  let statWatched = 0;
+  let hours = 0;
+  let minutes = 0;
 
-  const statTimeWatched = watchedMovies.map((film) => film.filmInfo.runTime).reduce((prevValue, curValue) => prevValue + curValue);
-  const hours = Math.floor(dayjs.duration(statTimeWatched, 'minutes').asHours(statTimeWatched));
-  const minutes = dayjs.duration(statTimeWatched, 'minutes').minutes(statTimeWatched);
+  if (moviesInPeriod.length !== 0) {
+    genreStat = findGenreStatisic(moviesInPeriod);
+    topGenre = findTopGenre(genreStat);
+    statWatched = moviesInPeriod.length;
+
+    const statTimeWatched = moviesInPeriod.map((film) => film.filmInfo.runTime).reduce((prevValue, curValue) => prevValue + curValue);
+    hours = Math.floor(dayjs.duration(statTimeWatched, 'minutes').asHours(statTimeWatched));
+    minutes = dayjs.duration(statTimeWatched, 'minutes').minutes(statTimeWatched);
+  }
+
   const timeDuration = (hours===0)
     ? `${minutes}<span class="statistic__item-description">m</span>`
     : `${hours}<span class="statistic__item-description">h</span> ${minutes}<span class="statistic__item-description">m</span>`;
@@ -104,25 +133,30 @@ const createStatisticTemplate = (watchedMovies, topGenre) => {
   <p class="statistic__rank">
     Your rank
     <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-    <span class="statistic__rank-label">Movie buff</span>
+    <span class="statistic__rank-label">${profileName}</span>
   </p>
 
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatiscticType.ALL}" checked>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatiscticType.ALL}"
+    ${currentType === StatiscticType.ALL ? 'checked' : ' '}>
     <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatiscticType.TODAY}">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatiscticType.TODAY}"
+    ${currentType === StatiscticType.TODAY ? 'checked' : ' '}>
     <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatiscticType.WEEK}">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatiscticType.WEEK}"
+    ${currentType === StatiscticType.WEEK ? 'checked' : ' '}>
     <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatiscticType.MONTH}">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatiscticType.MONTH}"
+    ${currentType === StatiscticType.MONTH ? 'checked' : ' '}>
     <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatiscticType.YEAR}">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatiscticType.YEAR}"
+    ${currentType === StatiscticType.YEAR ? 'checked' : ' '}>
     <label for="statistic-year" class="statistic__filters-label">Year</label>
   </form>
 
@@ -149,33 +183,25 @@ const createStatisticTemplate = (watchedMovies, topGenre) => {
 };
 
 export default class StatisticView extends SmartView {
-  #movies = null;
-  #topGenre = '';
-  #genreStat = [];
   #watchedMovies = [];
   #currentType = StatiscticType.ALL;
+  #filmPeriod = [];
 
   constructor(movies) {
     super();
-    this.#movies = movies;
+
     this.#watchedMovies = filter[FilterType.HISTORY](movies);
     this._data = {
-      dateFrom: dayjs().subtract(PERIOD_STAT.ALL, 'year'),
-      dateTo: dayjs(),
+      dateFrom: dayjs().subtract(PERIOD_STAT.ALL, 'year').toDate(),
+      dateTo: dayjs().toDate(),
     };
-
-    const findGenre = (film, genre) => film.filmInfo.genre.find((filmGenre) => filmGenre === genre);
-    this.#genreStat = GENRE.map((genre) => movies.filter((film) => findGenre(film, genre) === genre).length);
-    const maxGenreStat = Math.max.apply(null, this.#genreStat);
-    const topGenreIndex = this.#genreStat.findIndex((genre) => genre === maxGenreStat);
-    this.#topGenre = GENRE[topGenreIndex];
 
     this.#setStatisticTypeChangeHandler();
     this.#setCharts();
   }
 
   get template() {
-    return createStatisticTemplate(this.#watchedMovies, this.#topGenre);
+    return createStatisticTemplate(this.#watchedMovies, this.#currentType, this._data.dateFrom, this._data.dateTo);
   }
 
   removeElement = () => {
@@ -183,6 +209,7 @@ export default class StatisticView extends SmartView {
   }
 
   restoreHandlers = () => {
+    this.#setStatisticTypeChangeHandler();
     this.#setCharts();
   }
 
@@ -193,13 +220,12 @@ export default class StatisticView extends SmartView {
 
   #updateChangeTypeHandler = (date) => {
     const {dateFrom, dateTo} = date;
-    if (!dateFrom || !dateTo) {
-      return;
-    }
+
     this.updateData({
       dateFrom,
       dateTo,
     });
+
   }
 
   #statisticTypeChangeHandler = (evt) => {
@@ -210,34 +236,34 @@ export default class StatisticView extends SmartView {
       this.#currentType = StatiscticType.TODAY;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ONE_DAY, 'day').toDate();
 
-      this.#updateChangeTypeHandler();
+      this.#updateChangeTypeHandler(this._data);
     }
 
     if (type === StatiscticType.WEEK) {
       this.#currentType = StatiscticType.WEEK;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ONE_WEEK, 'day').toDate();
 
-      this.#updateChangeTypeHandler();
+      this.#updateChangeTypeHandler(this._data);
     }
 
     if (type === StatiscticType.MONTH) {
       this.#currentType = StatiscticType.MONTH;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.MONTH, 'month').toDate();
 
-      this.#updateChangeTypeHandler();
+      this.#updateChangeTypeHandler(this._data);
     }
 
     if (type === StatiscticType.YEAR) {
       this.#currentType = StatiscticType.YEAR;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.YEAR, 'year').toDate();
-      this.#updateChangeTypeHandler();
-    }
 
+      this.#updateChangeTypeHandler(this._data);
+    }
 
     if (type === StatiscticType.ALL) {
       this.#currentType = StatiscticType.ALL;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ALL, 'year').toDate();
-      this.#updateChangeTypeHandler();
+      this.#updateChangeTypeHandler(this._data);
     }
 
   }
@@ -245,7 +271,7 @@ export default class StatisticView extends SmartView {
   #setCharts = () => {
     const {dateFrom, dateTo} = this._data;
     const statisticCtx = this.element.querySelector('.statistic__chart');
-    renderDiagramChart(statisticCtx, this.#genreStat, dateFrom, dateTo, this.#watchedMovies);
+    renderDiagramChart(statisticCtx, this.#watchedMovies, dateFrom, dateTo);
   }
 
 
