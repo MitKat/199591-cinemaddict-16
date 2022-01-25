@@ -1,16 +1,34 @@
 import SmartView from './smart-view.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {GENRE, FilterType} from '../utils/const.js';
+import {GENRE, FilterType, StatiscticType} from '../utils/const.js';
 import {filter} from '../utils/filter.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(duration);
+dayjs.extend(isBetween);
 
 const BAR_HEIGHT = 50;
 
-const renderDiagramChart = (statisticCtx, genreStat) => {
+const PERIOD_STAT = {
+  ALL: 200,
+  ONE_DAY: 1,
+  ONE_WEEK: 7,
+  MONTH: 1,
+  YEAR: 1,
+};
+
+const renderDiagramChart = (statisticCtx, genreStat, dateFrom, dateTo, watchedMovies) => {
   statisticCtx.height = BAR_HEIGHT * GENRE.length;
+  // console.log(dateFrom);
+  // console.log(dayjs(watchedMovies[3].userDetails.watchingDate));
+
+  const isWatchedInPeriod = (movie, from, to) => dayjs(movie.userDetails.watchingDate).isBetween(from, to, 'year');
+  // console.log(isWatchedInPeriod);
+
+  const filteredMovies = watchedMovies.filter((movie) => isWatchedInPeriod(movie, dateFrom, dateTo));
+  console.log(filteredMovies);
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
@@ -92,19 +110,19 @@ const createStatisticTemplate = (watchedMovies, topGenre) => {
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatiscticType.ALL}" checked>
     <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatiscticType.TODAY}">
     <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatiscticType.WEEK}">
     <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatiscticType.MONTH}">
     <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatiscticType.YEAR}">
     <label for="statistic-year" class="statistic__filters-label">Year</label>
   </form>
 
@@ -135,12 +153,16 @@ export default class StatisticView extends SmartView {
   #topGenre = '';
   #genreStat = [];
   #watchedMovies = [];
+  #currentType = StatiscticType.ALL;
 
   constructor(movies) {
     super();
     this.#movies = movies;
     this.#watchedMovies = filter[FilterType.HISTORY](movies);
-    // watchedMovies.filter((movie) => movie.userDetails.watchingDate)
+    this._data = {
+      dateFrom: dayjs().subtract(PERIOD_STAT.ALL, 'year'),
+      dateTo: dayjs(),
+    };
 
     const findGenre = (film, genre) => film.filmInfo.genre.find((filmGenre) => filmGenre === genre);
     this.#genreStat = GENRE.map((genre) => movies.filter((film) => findGenre(film, genre) === genre).length);
@@ -148,6 +170,7 @@ export default class StatisticView extends SmartView {
     const topGenreIndex = this.#genreStat.findIndex((genre) => genre === maxGenreStat);
     this.#topGenre = GENRE[topGenreIndex];
 
+    this.#setStatisticTypeChangeHandler();
     this.#setCharts();
   }
 
@@ -163,9 +186,66 @@ export default class StatisticView extends SmartView {
     this.#setCharts();
   }
 
+  #setStatisticTypeChangeHandler = () => {
+    this.element.querySelector('.statistic__filters')
+      .addEventListener('change', this.#statisticTypeChangeHandler);
+  }
+
+  #updateChangeTypeHandler = (date) => {
+    const {dateFrom, dateTo} = date;
+    if (!dateFrom || !dateTo) {
+      return;
+    }
+    this.updateData({
+      dateFrom,
+      dateTo,
+    });
+  }
+
+  #statisticTypeChangeHandler = (evt) => {
+    evt.preventDefault();
+    const type = evt.target.value;
+
+    if (type === StatiscticType.TODAY) {
+      this.#currentType = StatiscticType.TODAY;
+      this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ONE_DAY, 'day').toDate();
+
+      this.#updateChangeTypeHandler();
+    }
+
+    if (type === StatiscticType.WEEK) {
+      this.#currentType = StatiscticType.WEEK;
+      this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ONE_WEEK, 'day').toDate();
+
+      this.#updateChangeTypeHandler();
+    }
+
+    if (type === StatiscticType.MONTH) {
+      this.#currentType = StatiscticType.MONTH;
+      this._data.dateFrom = dayjs().subtract(PERIOD_STAT.MONTH, 'month').toDate();
+
+      this.#updateChangeTypeHandler();
+    }
+
+    if (type === StatiscticType.YEAR) {
+      this.#currentType = StatiscticType.YEAR;
+      this._data.dateFrom = dayjs().subtract(PERIOD_STAT.YEAR, 'year').toDate();
+      this.#updateChangeTypeHandler();
+    }
+
+
+    if (type === StatiscticType.ALL) {
+      this.#currentType = StatiscticType.ALL;
+      this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ALL, 'year').toDate();
+      this.#updateChangeTypeHandler();
+    }
+
+  }
+
   #setCharts = () => {
+    const {dateFrom, dateTo} = this._data;
     const statisticCtx = this.element.querySelector('.statistic__chart');
-    renderDiagramChart(statisticCtx, this.#genreStat);
+    renderDiagramChart(statisticCtx, this.#genreStat, dateFrom, dateTo, this.#watchedMovies);
   }
 
 

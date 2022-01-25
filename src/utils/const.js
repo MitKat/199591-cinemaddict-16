@@ -39,14 +39,12 @@ export const GENRE = [
   'Comedy',
 ];
 
-export const Genre = {
-  DRAMA: 'Drama',
-  THRILLER: 'Thriller',
-  ANIMATION: 'Animation',
-  ADVENTURE: 'Adventure',
-  FAMILY: 'Family',
-  SCIFI: 'Sci-Fi',
-  ACTION: 'Action',
-  HORROR: 'Horror',
-  COMEDY: 'Comedy',
+export const StatiscticType = {
+  ALL: 'All',
+  TODAY: 'Today',
+  WEEK: 'Week',
+  MONTH: 'Month',
+  YEAR: 'Year',
 };
+
+
