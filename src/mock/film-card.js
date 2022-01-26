@@ -9,6 +9,7 @@ const MAX_AGE_RATING = 19;
 const MAX_RUN_TIME_MINUTE = 240;
 const MIN_YEAR = 1940;
 const MAX_YEAR = 2022;
+const COUNT_COMMENT = 10;
 
 const titles = [
   'The Man with the Golden Arm',
@@ -29,12 +30,15 @@ const alternativeTitles = [
   'The Great Flamarion',
 ];
 const genres = [
-  'Musical',
-  'Comedy',
-  'Mystery',
   'Drama',
-  'Cartoon',
-  'Western',
+  'Thriller',
+  'Animation',
+  'Adventure',
+  'Family',
+  'Sci-Fi',
+  'Action',
+  'Horror',
+  'Comedy',
 ];
 const images = [
   './images/posters/made-for-each-other.png',
@@ -128,18 +132,12 @@ const generateDateRelease = () => {
 };
 
 const generateWatchingDate = () => {
-  const isDate = Boolean(getRandomInteger(0, 1));
+  const randomDay = getRandomInteger(0, 31);
+  const randomMonth = getRandomInteger(11, 12);
+  const randomYear =  2021;
 
-  if (!isDate) {
-    return null;
-  }
-
-  const maxDays = 30;
-  const daysGap = getRandomInteger(0, -maxDays);
-
-  return dayjs().add(daysGap, 'day').toDate();
+  return dayjs().add(randomDay, 'day').add(randomMonth, 'month').year(randomYear);
 };
-const COUNT_COMMENT = 10;
 
 const generateCommentsList = () => {
   const count = getRandomInteger(0, COUNT_COMMENT);

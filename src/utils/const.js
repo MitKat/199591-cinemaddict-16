@@ -22,3 +22,29 @@ export const FilterType = {
   FAVORITES: 'favorites',
 };
 
+export const NavigationType = {
+  FILM_LIST: 'FILM_LIST',
+  STATISTIC: 'STATISTIC',
+};
+
+export const GENRE = [
+  'Drama',
+  'Thriller',
+  'Animation',
+  'Adventure',
+  'Family',
+  'Sci-Fi',
+  'Action',
+  'Horror',
+  'Comedy',
+];
+
+export const StatiscticType = {
+  ALL: 'All',
+  TODAY: 'Today',
+  WEEK: 'Week',
+  MONTH: 'Month',
+  YEAR: 'Year',
+};
+
+

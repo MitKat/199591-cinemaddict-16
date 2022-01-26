@@ -1,5 +1,6 @@
-import {render, RenderPosition} from './utils/render.js';
+import {remove, render, RenderPosition} from './utils/render.js';
 import {generateCardFilm} from './mock/film-card.js';
+import {NavigationType, UpdateType} from './utils/const.js';
 import MainNavigationView from './view/main-navigation-view.js';
 import ProfileView from './view/profile-view.js';
 import FooterView from './view/footer-view.js';
@@ -8,6 +9,7 @@ import MoviesModel from './model/movies-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import StatisticView from './view/statistic-view.js';
+import ScreenModel from './model/screen-model.js';
 
 
 const FILM_COUNT = 33;
@@ -23,21 +25,48 @@ const siteHeaderElement = document.querySelector('.header');
 const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
-render(siteMainElement, new MainNavigationView(), RenderPosition.BEFOREBEGIN);
+const mainNavigationComponent = new MainNavigationView();
+render(siteHeaderElement, new ProfileView(moviesModel.movies), RenderPosition.BEFOREEND);
+
+const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
+
+
+let statisticComponent = new StatisticView(moviesModel.movies);
+const screenModel = new ScreenModel();
+
+render(siteMainElement, mainNavigationComponent, RenderPosition.BEFOREBEGIN);
 
 const filterContainer = document.querySelector('.main-navigation');
+const handleNavigationClick = (type) => {
+  switch (type) {
+    case NavigationType.FILM_LIST:
+      if (screenModel.screen !== NavigationType.FILM_LIST) {
+        screenModel.setScreen(UpdateType.PATCH, NavigationType.FILM_LIST);
+        document.querySelector('.main-navigation__additional').classList.remove('main-navigation__additional--active');
+        remove(statisticComponent);
+        filmListPresenter.init();
+      }
+      break;
+    case NavigationType.STATISTIC:
+      if (screenModel.screen !== NavigationType.STATISTIC) {
+        screenModel.setScreen(UpdateType.PATCH, NavigationType.STATISTIC);
+        document.querySelector('.main-navigation__item--active').classList.remove('main-navigation__item--active');
+        filmListPresenter.destroy();
+        statisticComponent = new StatisticView(moviesModel.movies);
+        render(siteMainElement, statisticComponent, RenderPosition.BEFOREBEGIN);
+        document.querySelector('.main-navigation__additional').classList.add('main-navigation__additional--active');
+      }
+      break;
+  }
+};
 
-const filterPresenter = new FilterPresenter(filterContainer, filterModel, moviesModel);
+const filterPresenter = new FilterPresenter(filterContainer, filterModel, moviesModel, handleNavigationClick);
+
+mainNavigationComponent.setNavigationClickHandler(handleNavigationClick);
 
 filterPresenter.init();
 
-render(siteHeaderElement, new ProfileView(FILM_COUNT), RenderPosition.BEFOREEND);
-
-const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
 filmListPresenter.init();
 
-const statisticComponent = new StatisticView();
-
-render(siteMainElement, statisticComponent, RenderPosition.BEFOREBEGIN);
 
 render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);

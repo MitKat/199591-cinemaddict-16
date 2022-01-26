@@ -43,8 +43,6 @@ export default class FilmListPresenter {
     this.#moviesModel = moviesModel;
     this.#filterModel = filterModel;
 
-    this.#moviesModel.addObserver(this.#handleModelEvent);
-    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get films() {
@@ -66,6 +64,14 @@ export default class FilmListPresenter {
       render(this.#filmListContainer, this.#filmsBlockComponent, RenderPosition.BEFOREEND);
       render(this.#filmsBlockComponent, this.#filmsListComponent, RenderPosition.BEFOREEND);
       this.#renderFilmList(this.films);
+      this.#moviesModel.addObserver(this.#handleModelEvent);
+      this.#filterModel.addObserver(this.#handleModelEvent);
+    }
+
+    destroy = () => {
+      this.#clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
+      this.#moviesModel.removeObserver(this.#handleModelEvent);
+      this.#filterModel.removeObserver(this.#handleModelEvent);
     }
 
     #findFilmById = (filmId) => this.#moviesModel.movies.find((film) => film.id === filmId)
