@@ -185,7 +185,6 @@ const createStatisticTemplate = (watchedMovies, currentType, dateFrom, dateTo) =
 export default class StatisticView extends SmartView {
   #watchedMovies = [];
   #currentType = StatiscticType.ALL;
-  #filmPeriod = [];
 
   constructor(movies) {
     super();

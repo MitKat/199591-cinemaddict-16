@@ -1,20 +1,23 @@
 import FilterView from '../view/filter-view.js';
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import {filter} from '../utils/filter.js';
-import {FilterType, UpdateType} from '../utils/const.js';
+import {FilterType, NavigationType, UpdateType} from '../utils/const.js';
 
 
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #moviesModel = null;
+  #handleNavigationClick;
 
   #filterComponent = null;
 
-  constructor(filterContainer, filterModel, moviesModel) {
+  constructor(filterContainer, filterModel, moviesModel, handleNavigationClick) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#moviesModel = moviesModel;
+
+    this.#handleNavigationClick = handleNavigationClick;
 
     this.#moviesModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
@@ -70,7 +73,7 @@ export default class FilterPresenter {
     if (this.#filterModel.filter === filterType) {
       return;
     }
-
+    this.#handleNavigationClick(NavigationType.FILM_LIST);
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 }
