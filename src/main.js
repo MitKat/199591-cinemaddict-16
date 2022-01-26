@@ -26,12 +26,12 @@ const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
 const mainNavigationComponent = new MainNavigationView();
-render(siteHeaderElement, new ProfileView(filmCards), RenderPosition.BEFOREEND);
+render(siteHeaderElement, new ProfileView(moviesModel.movies), RenderPosition.BEFOREEND);
 
 const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
 
 
-let statisticComponent = new StatisticView(filmCards);
+let statisticComponent = new StatisticView(moviesModel.movies);
 const screenModel = new ScreenModel();
 
 render(siteMainElement, mainNavigationComponent, RenderPosition.BEFOREBEGIN);
@@ -52,7 +52,7 @@ const handleNavigationClick = (type) => {
         screenModel.setScreen(UpdateType.PATCH, NavigationType.STATISTIC);
         document.querySelector('.main-navigation__item--active').classList.remove('main-navigation__item--active');
         filmListPresenter.destroy();
-        statisticComponent = new StatisticView(filmCards);
+        statisticComponent = new StatisticView(moviesModel.movies);
         render(siteMainElement, statisticComponent, RenderPosition.BEFOREBEGIN);
         document.querySelector('.main-navigation__additional').classList.add('main-navigation__additional--active');
       }

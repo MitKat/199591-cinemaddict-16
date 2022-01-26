@@ -1,8 +1,7 @@
 import SmartView from './smart-view.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {GENRE, FilterType, StatiscticType} from '../utils/const.js';
-import {filter} from '../utils/filter.js';
+import {GENRE, StatiscticType} from '../utils/const.js';
 import {generateProfileRank} from '../utils/common.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -189,7 +188,7 @@ export default class StatisticView extends SmartView {
   constructor(movies) {
     super();
 
-    this.#watchedMovies = filter[FilterType.HISTORY](movies);
+    this.#watchedMovies = movies.filter((film) => film.userDetails.isAlreadyWatched);
     this._data = {
       dateFrom: dayjs().subtract(PERIOD_STAT.ALL, 'year').toDate(),
       dateTo: dayjs().toDate(),
