@@ -1,5 +1,5 @@
 import {remove, render, RenderPosition} from './utils/render.js';
-import {generateCardFilm} from './mock/film-card.js';
+// import {generateCardFilm} from './mock/film-card.js';
 import {NavigationType, UpdateType} from './utils/const.js';
 import MainNavigationView from './view/main-navigation-view.js';
 import ProfileView from './view/profile-view.js';
@@ -10,15 +10,12 @@ import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 import StatisticView from './view/statistic-view.js';
 import ScreenModel from './model/screen-model.js';
+import ApiService from './api-service.js';
 
+const AUTHORIZATION = 'Basic leof9797dnw04kr';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
-const FILM_COUNT = 33;
-
-const filmCards = Array.from({length: FILM_COUNT}, (_, i) => generateCardFilm(i+1));
-
-const moviesModel = new MoviesModel();
-moviesModel.movies = filmCards;
-
+const moviesModel = new MoviesModel(new ApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.header');
@@ -26,11 +23,7 @@ const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
 const mainNavigationComponent = new MainNavigationView();
-render(siteHeaderElement, new ProfileView(moviesModel.movies), RenderPosition.BEFOREEND);
-
 const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
-
-
 let statisticComponent = new StatisticView(moviesModel.movies);
 const screenModel = new ScreenModel();
 
@@ -68,5 +61,7 @@ filterPresenter.init();
 
 filmListPresenter.init();
 
-
-render(siteFooterElement, new FooterView(filmCards.length), RenderPosition.BEFOREEND);
+moviesModel.init().finally(() => {
+  render(siteHeaderElement, new ProfileView(moviesModel.movies), RenderPosition.BEFOREEND);
+  render(siteFooterElement, new FooterView(moviesModel.movies.length), RenderPosition.BEFOREEND);
+});

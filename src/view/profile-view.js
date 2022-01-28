@@ -2,8 +2,7 @@ import AbstractView from './abstract-view.js';
 import {generateProfileRank} from '../utils/common.js';
 
 const createProfileTemplate = (movies) => {
-  const Item = movies.filter((film) => film.userDetails.isAlreadyWatched);
-  const profileName = generateProfileRank(Item.length);
+  const profileName = generateProfileRank(movies.length);
 
   return (`<section class="header__profile profile">
   <p class="profile__rating">${profileName}</p>
@@ -12,14 +11,14 @@ const createProfileTemplate = (movies) => {
 };
 
 export default class ProfileView extends AbstractView {
-  #movies = null;
+  #watchedMovies = null;
 
   constructor(movies) {
     super();
-    this.#movies = movies;
+    this.#watchedMovies = movies.filter((film) => film.userDetails.isAlreadyWatched);
   }
 
   get template() {
-    return createProfileTemplate(this.#movies);
+    return createProfileTemplate(this.#watchedMovies);
   }
 }

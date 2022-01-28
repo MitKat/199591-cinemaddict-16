@@ -6,6 +6,7 @@ import PopupView from '../view/popup-view';
 import NewCommentView from '../view/new-comment-view';
 import CommentsPopupView from '../view/comments-view';
 import NoFilmsView from '../view/no-films-view';
+import LoadingView from '../view/loading-view';
 import FilmPresenter from './film-presenter.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {FilterType, SortType, UpdateType, UserAction} from '../utils/const';
@@ -21,6 +22,7 @@ export default class FilmListPresenter {
   #filmListContainer = null;
   #filmsBlockComponent = new FilmsBlockView();
   #filmsListComponent = new FilmsListView();
+  #loadingComponent = new LoadingView();
   #noFilmsComponent = null;
   #buttonShowMoreComponent = null;
   #sortingComponent = null;
@@ -32,6 +34,7 @@ export default class FilmListPresenter {
   #renderedFilmCount = FILM_COUNT_STEP;
   #filterType = FilterType.ALL;
   #popupScrollPosition = 0;
+  #isLoading = true;
 
   #moviesModel = null;
   #filterModel = null;
@@ -272,7 +275,16 @@ export default class FilmListPresenter {
       this.#renderFilmList();
     }
 
+    #renderLoading = () => {
+      render(this.#filmsBlockComponent, this.#loadingComponent, RenderPosition.BEFOREEND);
+    }
+
     #renderFilmList = () => {
+      if (this.#isLoading) {
+        this.#renderLoading();
+        return;
+      }
+
       const filmCount = this.films.length;
 
       const films = this.films.slice(0, Math.min(filmCount, this.#renderedFilmCount));
@@ -294,6 +306,7 @@ export default class FilmListPresenter {
 
       this.#filmPresenter.forEach((presenter) => presenter.destroy());
       this.#filmPresenter.clear();
+      remove(this.#loadingComponent);
       remove(this.#sortingComponent);
       remove(this.#buttonShowMoreComponent);
 
@@ -344,6 +357,11 @@ export default class FilmListPresenter {
               // - обновить всю доску (например, при переключении фильтра)
               this.#clearFilmList({resetRenderedFilmCount: true, resetSortType: true});
               this.#renderSort();
+              this.#renderFilmList();
+              break;
+            case UpdateType.INIT:
+              this.#isLoading = false;
+              remove(this.#loadingComponent);
               this.#renderFilmList();
               break;
           }
