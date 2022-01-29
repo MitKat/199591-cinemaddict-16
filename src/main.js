@@ -14,8 +14,9 @@ import ApiService from './api-service.js';
 
 const AUTHORIZATION = 'Basic leof9797dnw04kr';
 const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
+const apiService = new ApiService(END_POINT, AUTHORIZATION);
 
-const moviesModel = new MoviesModel(new ApiService(END_POINT, AUTHORIZATION));
+const moviesModel = new MoviesModel(apiService);
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.header');
@@ -23,7 +24,7 @@ const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
 const mainNavigationComponent = new MainNavigationView();
-const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel);
+const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel, apiService);
 let statisticComponent = new StatisticView(moviesModel.movies);
 const screenModel = new ScreenModel();
 
@@ -62,6 +63,6 @@ filterPresenter.init();
 filmListPresenter.init();
 
 moviesModel.init().finally(() => {
-  render(siteHeaderElement, new ProfileView(moviesModel.movies), RenderPosition.BEFOREEND);
+  render(siteHeaderElement, new ProfileView(moviesModel), RenderPosition.BEFOREEND);
   render(siteFooterElement, new FooterView(moviesModel.movies.length), RenderPosition.BEFOREEND);
 });

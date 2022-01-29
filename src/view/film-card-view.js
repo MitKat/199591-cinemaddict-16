@@ -3,6 +3,7 @@ import duration from 'dayjs/plugin/duration';
 import AbstractView from './abstract-view.js';
 dayjs.extend(duration);
 
+const MAX_SYMBOL=140;
 
 const createFilmCardTemplate = (cardItem) => {
   const {comments, filmInfo, release, userDetails} = cardItem;
@@ -36,7 +37,8 @@ const createFilmCardTemplate = (cardItem) => {
       <span class="film-card__genre">${filmInfo.genre[0]}</span>
     </p>
     <img src="${filmInfo.poster}" alt="" class="film-card__poster">
-    <p class="film-card__description">${filmInfo.description}</p>
+    <p class="film-card__description">${filmInfo.description.length > MAX_SYMBOL ?
+    `${filmInfo.description.substring(0, MAX_SYMBOL-1)} ...` : `${filmInfo.description}`}</p>
     <span class="film-card__comments">${comments.length} comments</span>
   </a>
   <div class="film-card__controls">

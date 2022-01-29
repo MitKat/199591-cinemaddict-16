@@ -98,6 +98,16 @@ export default class ApiService {
     return adaptedMovie;
   }
 
+  // #adaptToServer = (comment) => {
+  //   const adaptedComment = {...comment,
+  //     'comment': comment.text,
+  //   };
+
+  //   delete adaptedComment.text;
+
+  //   return adaptedComment;
+  // }
+
   static parseResponse = (response) => response.json();
 
   static checkStatus = (response) => {

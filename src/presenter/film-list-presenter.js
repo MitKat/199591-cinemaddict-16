@@ -35,17 +35,19 @@ export default class FilmListPresenter {
   #filterType = FilterType.ALL;
   #popupScrollPosition = 0;
   #isLoading = true;
+  #comments = [];
 
   #moviesModel = null;
   #filterModel = null;
+  #apiService = null;
 
   #filmPresenter = new Map();
 
-  constructor (filmListContainer, moviesModel, filterModel) {
+  constructor (filmListContainer, moviesModel, filterModel, apiService) {
     this.#filmListContainer = filmListContainer;
     this.#moviesModel = moviesModel;
     this.#filterModel = filterModel;
-
+    this.#apiService = apiService;
   }
 
   get films() {
@@ -123,11 +125,12 @@ export default class FilmListPresenter {
       this.#renderPopup(filmId);
     }
 
-    #renderPopup = (filmId) => {
+    #renderPopup = async (filmId) => {
       const filmItem = this.#findFilmById(filmId);
-
+      this.#comments = await this.#apiService.getComments(filmId);
+      this.#comments = this.#comments.map(this.#adaptCommentsToClient);
       this.#popupComponent = new PopupView(filmItem);
-      this.#popupCommentsComponent = new CommentsPopupView(filmItem);
+      this.#popupCommentsComponent = new CommentsPopupView(this.#comments);
       this.#popupNewCommentComponent = new NewCommentView();
 
       body.classList.add('hide-overflow');
@@ -158,14 +161,14 @@ export default class FilmListPresenter {
           evt.preventDefault();
           this.#savePopupPosition();
 
-          const movieCommentsNewArray = filmItem.comments.slice();
+          const movieCommentsNewArray = this.#comments.slice();
           commentNew.text = this.#popupNewCommentComponent._data.message;
           commentNew.emotion =  `${this.#popupNewCommentComponent._data.smile}.png`;
 
           if (commentNew.text !== '' && commentNew.emotion !== '') {
             movieCommentsNewArray.push(commentNew);
 
-            this.#updateCommentsArray(filmItem, movieCommentsNewArray);
+            this.#updateCommentsArray(this.#comments, movieCommentsNewArray);
           }
         }
       };
@@ -184,26 +187,34 @@ export default class FilmListPresenter {
       this.#popupComponent.element.scroll(0, this.#popupScrollPosition);
     }
 
-    #updateCommentsArray = (filmItem, movieCommentsNewArray) => {
+    #adaptCommentsToClient = (comment) => {
+      const adaptedComment = {...comment,
+        text: comment['comment'],
+      };
+
+      delete adaptedComment['comment'];
+
+      return adaptedComment;
+    }
+
+    #updateCommentsArray = (comments, movieCommentsNewArray) => {
       this.#handleViewAction(
         UserAction.UPDATE_FILM,
         UpdateType.MINOR,
-        {...filmItem, comments: movieCommentsNewArray}
+        {...comments, comments: movieCommentsNewArray}
       );
     }
 
-    #handleDeleteClickComment = (filmId, commentId) => {
+    #handleDeleteClickComment = (commentId) => {
       this.#savePopupPosition();
       remove(this.#popupCommentsComponent);
-      const filmItem = this.#findFilmById(filmId);
-      const {comments} = filmItem;
-      const oldCommentIndex = comments.findIndex((comment) => comment.id === commentId);
+      const oldCommentIndex = this.#comments.findIndex((comment) => comment.id === commentId);
 
       const movieCommentsNewArray = [
-        ...comments.slice(0, oldCommentIndex),
-        ...comments.slice(oldCommentIndex + 1),
+        ...this.#comments.slice(0, oldCommentIndex),
+        ...this.#comments.slice(oldCommentIndex + 1),
       ];
-      this.#updateCommentsArray(filmItem, movieCommentsNewArray);
+      this.#updateCommentsArray(this.#comments, movieCommentsNewArray);
     }
 
     #handleWatchlistClick = (filmId) => {
