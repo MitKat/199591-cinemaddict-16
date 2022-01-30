@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
 
+const RankValue = {
+  MIN: 0,
+  MIDDLE: 10,
+  MAX: 20,
+};
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 export const getRandomInteger = (a = 0, b = 1) => {
@@ -36,11 +41,11 @@ export function shuffle(array) {
 
 export const generateProfileRank = (history) => {
   let profileName = 'Movie Buff';
-  if (history === 0) {
+  if (history === RankValue.MIN) {
     profileName = '';
-  } else if (history <= 10) {
+  } else if (history <= RankValue.MIDDLE) {
     profileName = 'Novice';
-  } else if (history > 10 && history <= 20) {
+  } else if (history > RankValue.MIDDLE && history <= RankValue.MAX) {
     profileName = 'Fan';
   }
   return profileName;

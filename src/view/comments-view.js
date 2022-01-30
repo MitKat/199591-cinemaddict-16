@@ -1,26 +1,28 @@
 import AbstractView from './abstract-view.js';
 import he from 'he';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+dayjs.extend(relativeTime);
 
 const createCommentItemTemplate = (comment) => {
   const {id, author, text, date, emotion} = comment;
 
   return `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
-    <img src="./images/emoji/${emotion}" width="55" height="55" alt="${emotion}">
+    <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="${emotion}">
   </span>
   <div>
     <p class="film-details__comment-text">${he.encode(text)}</p>
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
-      <span class="film-details__comment-day">${date}</span>
+      <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
       <button class="film-details__comment-delete" value="${id}">Delete</button>
     </p>
   </div>
 </li>`;
 };
 
-const createCommentsPopupTemplate = (film) => {
-  const {comments} = film;
+const createCommentsPopupTemplate = (comments) => {
   const commentItemTemplate = comments.map((comment) => createCommentItemTemplate(comment))
     .join(' ');
 
@@ -34,15 +36,15 @@ const createCommentsPopupTemplate = (film) => {
 };
 
 export default class CommentsPopupView extends AbstractView {
-  #film = null;
+  #comments = null;
 
-  constructor(film) {
+  constructor(comments) {
     super();
-    this.#film = film;
+    this.#comments = comments;
   }
 
   get template() {
-    return createCommentsPopupTemplate(this.#film);
+    return createCommentsPopupTemplate(this.#comments);
   }
 
   setDeleteClickHandler = (callback) => {
@@ -54,6 +56,6 @@ export default class CommentsPopupView extends AbstractView {
   #commentDeleteClickHandler = (evt) => {
     evt.preventDefault();
     const commentId = evt.target.value;
-    this._callback.deleteClick(this.#film.id, commentId);
+    this._callback.deleteClick(commentId);
   }
 }
