@@ -12,7 +12,6 @@ import {render, RenderPosition, remove} from '../utils/render.js';
 import {FilterType, SortType, UpdateType, UserAction} from '../utils/const';
 import {sortDateFunction, sortRatingFunction} from '../utils/common';
 import {filter} from '../utils/filter.js';
-import {nanoid} from 'nanoid';
 
 const FILM_COUNT_STEP = 5;
 const siteFooterElement = document.querySelector('.footer');
@@ -40,14 +39,16 @@ export default class FilmListPresenter {
   #moviesModel = null;
   #filterModel = null;
   #apiService = null;
+  #commentsModel = null;
 
   #filmPresenter = new Map();
 
-  constructor (filmListContainer, moviesModel, filterModel, apiService) {
+  constructor (filmListContainer, moviesModel, filterModel, apiService, commentsModel) {
     this.#filmListContainer = filmListContainer;
     this.#moviesModel = moviesModel;
     this.#filterModel = filterModel;
     this.#apiService = apiService;
+    this.#commentsModel = commentsModel;
   }
 
   get films() {
@@ -152,7 +153,7 @@ export default class FilmListPresenter {
 
       const onCtrlEnterKeyDownHandler = (evt) => {
         const commentNew = {
-          id: nanoid(),
+          id: '',
           text: '',
           emotion: '',
         };
@@ -161,14 +162,18 @@ export default class FilmListPresenter {
           evt.preventDefault();
           this.#savePopupPosition();
 
-          const movieCommentsNewArray = this.#comments.slice();
+          // const movieCommentsNew = this.#comments.slice();
           commentNew.text = this.#popupNewCommentComponent._data.message;
           commentNew.emotion =  `${this.#popupNewCommentComponent._data.smile}.png`;
 
           if (commentNew.text !== '' && commentNew.emotion !== '') {
-            movieCommentsNewArray.push(commentNew);
 
-            this.#updateCommentsArray(this.#comments, movieCommentsNewArray);
+            // movieCommentsNew.push(commentNew);
+            const newComment = this.#commentsModel.addComment(filmItem, commentNew);
+            // console.log(newComment);
+            this.#comments = [newComment, ...this.#comments];
+
+            this.#updateCommentsArray(this.#comments);
           }
         }
       };
@@ -197,11 +202,10 @@ export default class FilmListPresenter {
       return adaptedComment;
     }
 
-    #updateCommentsArray = (comments, movieCommentsNewArray) => {
-      this.#handleViewAction(
-        UserAction.UPDATE_FILM,
+    #updateCommentsArray = (comments) => {
+      this.#handleModelEvent(
         UpdateType.MINOR,
-        {...comments, comments: movieCommentsNewArray}
+        {...comments}
       );
     }
 
@@ -343,8 +347,11 @@ export default class FilmListPresenter {
             case UserAction.UPDATE_FILM:
               this.#moviesModel.updateFilm(updateType, update);
               break;
-            case UserAction.DELETE_COMMENT:
-              this.#moviesModel.deleteComment(updateType, update);
+            // case UserAction.DELETE_COMMENT:
+            //   this.#moviesModel.deleteComment(updateType, update);
+            //   break;
+            case UserAction.ADD_COMMENT:
+              this.#moviesModel.updateFilm(updateType, update);
               break;
           }
         }

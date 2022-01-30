@@ -47,21 +47,6 @@ export default class MoviesModel extends AbstractObservable {
     }
   }
 
-  deleteComment = (updateType, update) => {
-    const index = this.#movies.findIndex((film) => film.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t delete unexisting film');
-    }
-
-    this.#movies = [
-      ...this.#movies.slice(0, index),
-      ...this.#movies.slice(index + 1),
-    ];
-
-    this._notify(updateType);
-  }
-
   #adaptToClient = (movie) => {
     const adaptedMovie = {...movie,
       ...movie.release, release: {
