@@ -63,3 +63,9 @@ export const sortRatingFunction = (filmA, filmB) => {
   return countB - countA;
 };
 
+export const sortCommentLengthFunction = (filmA, filmB) => {
+  const countA = filmA.comments.length;
+  const countB = filmB.comments.length;
+  return countB - countA;
+};
+

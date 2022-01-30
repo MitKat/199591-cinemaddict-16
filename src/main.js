@@ -11,14 +11,12 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import StatisticView from './view/statistic-view.js';
 import ScreenModel from './model/screen-model.js';
 import ApiService from './api-service.js';
-import CommentsModel from './model/comments-model.js';
 
 const AUTHORIZATION = 'Basic leof9797dnw04kr';
 const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 const apiService = new ApiService(END_POINT, AUTHORIZATION);
 
 const moviesModel = new MoviesModel(apiService);
-const commentsModel = new CommentsModel(apiService);
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.header');
@@ -26,7 +24,7 @@ const siteFooterElement = document.querySelector('.footer');
 const siteMainElement = document.querySelector('.main');
 
 const mainNavigationComponent = new MainNavigationView();
-const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel, apiService, commentsModel);
+const filmListPresenter = new FilmListPresenter(siteMainElement, moviesModel, filterModel, apiService);
 let statisticComponent = new StatisticView(moviesModel.movies);
 const screenModel = new ScreenModel();
 

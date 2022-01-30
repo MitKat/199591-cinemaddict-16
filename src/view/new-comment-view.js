@@ -2,13 +2,13 @@ import SmartView from './smart-view.js';
 import he from 'he';
 
 const createNewCommentTemplate = (_data) => {
-  const {smile, message} = _data;
-  const emojiImage = smile !== ''
-    ? `<img src="./images/emoji/${smile}.png"  width="55" height="55" alt="${smile}">`
+  const {emotion, text} = _data;
+  const emojiImage = emotion !== ''
+    ? `<img src="./images/emoji/${emotion}.png"  width="55" height="55" alt="${emotion}">`
     : '';
 
-  const comment = message !== ''
-    ? `${message}`
+  const comment = text !== ''
+    ? `${text}`
     : '';
 
   return `<div class="film-details__new-comment">
@@ -50,8 +50,8 @@ export default class NewCommentView extends SmartView {
     super();
 
     this._data = {
-      smile: '',
-      message: '',
+      emotion: '',
+      text: '',
     };
 
     this.#setInnerHandlers();
@@ -76,14 +76,14 @@ export default class NewCommentView extends SmartView {
     evt.preventDefault();
 
     this.updateData({
-      smile: evt.target.value,
+      emotion: evt.target.value,
     });
   }
 
   #descriptionInputHandler = (evt) => {
     evt.preventDefault();
     this.updateData({
-      message: evt.target.value,
+      text: evt.target.value,
     }, true);
   }
 
