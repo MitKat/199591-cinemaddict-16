@@ -4,9 +4,9 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
-const createCommentItemTemplate = (comment, isDeleting, isDisabled) => {
+const createCommentItemTemplate = (comment, isDeleting, deletingCommentId) => {
   const {id, author, text, date, emotion} = comment;
-  // const {isDeleting, isDisabled} = data;
+  const isDisabled = isDeleting && deletingCommentId === id;
 
   return `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
@@ -17,14 +17,14 @@ const createCommentItemTemplate = (comment, isDeleting, isDisabled) => {
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
-      <button class="film-details__comment-delete"  ${isDisabled ? 'disabled' : ''} value="${id}">${isDeleting ? 'deleting...' : 'delete'}</button>
+      <button class="film-details__comment-delete"  ${isDisabled ? 'disabled' : ''} value="${id}">${isDisabled ? 'deleting...' : 'delete'}</button>
     </p>
   </div>
 </li>`;
 };
 
-const createCommentsPopupTemplate = (comments) => {
-  const commentItemTemplate = comments.map((comment) => createCommentItemTemplate(comment))
+const createCommentsPopupTemplate = (comments, isDeleting, deletingCommentId) => {
+  const commentItemTemplate = comments.map((comment) => createCommentItemTemplate(comment, isDeleting, deletingCommentId))
     .join(' ');
 
   return `<section class="film-details__comments-wrap">
@@ -39,23 +39,24 @@ const createCommentsPopupTemplate = (comments) => {
 export default class CommentsPopupView extends SmartView {
   #comments = null;
   #film = null;
-  #isDeleting = true;
-  #isDisabled = false;
+  #deletingCommentId = null;
+  #isDeleting = null;
 
   constructor(film, comments) {
     super();
     this.#comments = comments;
     this.#film = film;
-    this._data = CommentsPopupView.parseCommentsToData(this.#film);
+    this._data = {
+      isDeleting: true,
+    };
   }
 
   get template() {
-    return createCommentsPopupTemplate(this.#comments, this.#isDeleting, this.#isDisabled);
+    return createCommentsPopupTemplate(this.#comments, this._data.isDeleting, this.#deletingCommentId);
   }
 
-  restoreHandlers = () => {
-    this.setDeleteClickHandler(this._callback.deleteClick);
-  }
+  restoreHandlers = () => { };
+
 
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
@@ -66,25 +67,9 @@ export default class CommentsPopupView extends SmartView {
   #commentDeleteClickHandler = (evt, film) => {
     evt.preventDefault();
     const commentId = evt.target.value;
+    this.#deletingCommentId = commentId;
     this._callback.deleteClick(film, commentId);
   }
 
-  reset = (film) => {
-    this.updateData(
-      CommentsPopupView.parseCommentsToData(film),
-    );
-  }
-
-  static parseCommentsToData = (film) => ({...film,
-    isDeleting: true,
-    isDisabled: false,
-  });
-
-  static parseDataToComments = (data) => {
-    const film = {...data};
-
-    delete film.isDeleting;
-    delete film.isDisabled;
-  }
 
 }

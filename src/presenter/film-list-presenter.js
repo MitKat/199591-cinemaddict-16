@@ -171,8 +171,14 @@ export default class FilmListPresenter {
           commentNew.emotion =  this.#popupNewCommentComponent._data.emotion;
 
           if (commentNew.text !== '' && commentNew.emotion !== '') {
-            const movieNew = await this.#apiService.addComment(filmItem, commentNew);
-            this.#moviesModel.updateFilmModel(UpdateType.MINOR, movieNew.movie);
+            try {
+              this.#popupNewCommentComponent.updateData({isDisabled: true});
+              const movieNew = await this.#apiService.addComment(filmItem, commentNew);
+              this.#moviesModel.updateFilmModel(UpdateType.MINOR, movieNew.movie);
+            } catch(err) {
+              const resetComment = () => this.#popupNewCommentComponent.updateData({isDisabled: false});
+              this.#popupNewCommentComponent.shake(resetComment);
+            }
           }
         }
       };
@@ -202,13 +208,15 @@ export default class FilmListPresenter {
     }
 
     #handleDeleteClickComment = async (filmItem, commentId) => {
-      this.#savePopupPosition();
-      await this.#apiService.deleteComment(commentId);
-      this.#popupCommentsComponent.updateData({
-        isDisabled: true,
-        isDeleting: true,
-      });
-      this.#moviesModel.updateFilm(UpdateType.MINOR, filmItem);
+      try {
+        this.#savePopupPosition();
+        this.#popupCommentsComponent.updateData({deletingCommentId: commentId});
+        await this.#apiService.deleteComment(commentId);
+        this.#moviesModel.updateFilm(UpdateType.MINOR, filmItem);
+      } catch(err) {
+        const resetDelete = () => this.#popupCommentsComponent.updateData({isDeleting: false});
+        this.#popupComponent.shake(resetDelete);
+      }
     }
 
     #handleWatchlistClick = (filmId) => {
