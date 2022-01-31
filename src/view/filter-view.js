@@ -10,7 +10,7 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
       ${name !== 'All movies' ?
       `${name} <span class="main-navigation__item-count">${count}</span>` : `${name}`}
 
-    </a> `
+    </a>`
   );
 };
 
@@ -46,6 +46,10 @@ export default class FilterView extends AbstractView {
 
   #filterTypeChangeHandler = (evt) => {
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.name);
+    let filter = evt.target.name;
+    if (filter === undefined) {
+      filter = evt.target.closest('a').name;
+    }
+    this._callback.filterTypeChange(filter);
   }
 }

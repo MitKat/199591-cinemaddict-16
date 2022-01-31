@@ -1,11 +1,12 @@
-import AbstractView from './abstract-view.js';
+import SmartView from './smart-view.js';
 import he from 'he';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
-const createCommentItemTemplate = (comment) => {
+const createCommentItemTemplate = (comment, isDeleting, isDisabled) => {
   const {id, author, text, date, emotion} = comment;
+  // const {isDeleting, isDisabled} = data;
 
   return `<li class="film-details__comment">
   <span class="film-details__comment-emoji">
@@ -16,7 +17,7 @@ const createCommentItemTemplate = (comment) => {
     <p class="film-details__comment-info">
       <span class="film-details__comment-author">${author}</span>
       <span class="film-details__comment-day">${dayjs(date).fromNow()}</span>
-      <button class="film-details__comment-delete" value="${id}">Delete</button>
+      <button class="film-details__comment-delete"  ${isDisabled ? 'disabled' : ''} value="${id}">${isDeleting ? 'deleting...' : 'delete'}</button>
     </p>
   </div>
 </li>`;
@@ -35,27 +36,55 @@ const createCommentsPopupTemplate = (comments) => {
 </section>`;
 };
 
-export default class CommentsPopupView extends AbstractView {
+export default class CommentsPopupView extends SmartView {
   #comments = null;
+  #film = null;
+  #isDeleting = true;
+  #isDisabled = false;
 
-  constructor(comments) {
+  constructor(film, comments) {
     super();
     this.#comments = comments;
+    this.#film = film;
+    this._data = CommentsPopupView.parseCommentsToData(this.#film);
   }
 
   get template() {
-    return createCommentsPopupTemplate(this.#comments);
+    return createCommentsPopupTemplate(this.#comments, this.#isDeleting, this.#isDisabled);
+  }
+
+  restoreHandlers = () => {
+    this.setDeleteClickHandler(this._callback.deleteClick);
   }
 
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
     this.element.querySelectorAll('.film-details__comment-delete')
-      .forEach((comment) => comment.addEventListener('click', this.#commentDeleteClickHandler));
+      .forEach((comment) => comment.addEventListener('click', (evt) => this.#commentDeleteClickHandler(evt, this.#film)));
   }
 
-  #commentDeleteClickHandler = (evt) => {
+  #commentDeleteClickHandler = (evt, film) => {
     evt.preventDefault();
     const commentId = evt.target.value;
-    this._callback.deleteClick(commentId);
+    this._callback.deleteClick(film, commentId);
   }
+
+  reset = (film) => {
+    this.updateData(
+      CommentsPopupView.parseCommentsToData(film),
+    );
+  }
+
+  static parseCommentsToData = (film) => ({...film,
+    isDeleting: true,
+    isDisabled: false,
+  });
+
+  static parseDataToComments = (data) => {
+    const film = {...data};
+
+    delete film.isDeleting;
+    delete film.isDisabled;
+  }
+
 }
