@@ -62,6 +62,14 @@ export default class NewCommentView extends SmartView {
     return createNewCommentTemplate(this._data);
   }
 
+  get commentText() {
+    return this._data.text;
+  }
+
+  get emoji() {
+    return this._data.emotion;
+  }
+
   restoreHandlers = () => {
     this.#setInnerHandlers();
   }

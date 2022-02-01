@@ -4,8 +4,9 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
-const createCommentItemTemplate = (comment, isDeleting, deletingCommentId) => {
+const createCommentItemTemplate = (comment, data) => {
   const {id, author, text, date, emotion} = comment;
+  const {isDeleting, deletingCommentId} = data;
   const isDisabled = isDeleting && deletingCommentId === id;
 
   return `<li class="film-details__comment">
@@ -39,35 +40,39 @@ const createCommentsPopupTemplate = (comments, isDeleting, deletingCommentId) =>
 export default class CommentsPopupView extends SmartView {
   #comments = null;
   #film = null;
-  #deletingCommentId = null;
 
   constructor(film, comments) {
     super();
     this.#comments = comments;
     this.#film = film;
     this._data = {
-      isDeleting: true,
+      isDeleting: false,
+      deletingCommentId: null,
     };
   }
 
   get template() {
-    return createCommentsPopupTemplate(this.#comments, this._data.isDeleting, this.#deletingCommentId);
+    return createCommentsPopupTemplate(this.#comments, this._data);
   }
 
-  restoreHandlers = () => { };
+  restoreHandlers = () => {
+    this.#deleteClickHandler();
+  };
 
 
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
+    this.#deleteClickHandler();
+  }
+
+  #deleteClickHandler = () => {
     this.element.querySelectorAll('.film-details__comment-delete')
       .forEach((comment) => comment.addEventListener('click', (evt) => this.#commentDeleteClickHandler(evt, this.#film)));
   }
 
   #commentDeleteClickHandler = (evt, film) => {
     evt.preventDefault();
-    const commentId = evt.target.value;
-    this.#deletingCommentId = commentId;
-    this._callback.deleteClick(film, commentId);
+    this._callback.deleteClick(film, evt.target.value);
   }
 
 
