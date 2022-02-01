@@ -2,13 +2,13 @@ import SmartView from './smart-view.js';
 import he from 'he';
 
 const createNewCommentTemplate = (_data) => {
-  const {smile, message} = _data;
-  const emojiImage = smile !== ''
-    ? `<img src="./images/emoji/${smile}.png"  width="55" height="55" alt="${smile}">`
+  const {emotion, text, isDisabled} = _data;
+  const emojiImage = emotion !== ''
+    ? `<img src="./images/emoji/${emotion}.png"  width="55" height="55" alt="${emotion}">`
     : '';
 
-  const comment = message !== ''
-    ? `${message}`
+  const comment = text !== ''
+    ? `${text}`
     : '';
 
   return `<div class="film-details__new-comment">
@@ -17,26 +17,26 @@ const createNewCommentTemplate = (_data) => {
      </div>
 
      <label class="film-details__comment-label">
-       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(comment)}</textarea>
+       <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" ${isDisabled ? 'disabled' : ''} name="comment">${he.encode(comment)}</textarea>
      </label>
 
      <div class="film-details__emoji-list">
-       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile">
+       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-smile" value="smile" ${isDisabled ? 'disabled' : ''}>
        <label class="film-details__emoji-label" for="emoji-smile">
          <img src="./images/emoji/smile.png" width="30" height="30" alt="emoji">
        </label>
 
-       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
+       <input class="film-details__emoji-item visually-hidden" ${isDisabled ? 'disabled' : ''} name="comment-emoji" type="radio" id="emoji-sleeping" value="sleeping">
        <label class="film-details__emoji-label" for="emoji-sleeping">
          <img src="./images/emoji/sleeping.png" width="30" height="30" alt="emoji">
        </label>
 
-       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-puke" value="puke">
+       <input class="film-details__emoji-item visually-hidden" ${isDisabled ? 'disabled' : ''} name="comment-emoji" type="radio" id="emoji-puke" value="puke">
        <label class="film-details__emoji-label" for="emoji-puke">
          <img src="./images/emoji/puke.png" width="30" height="30" alt="emoji">
        </label>
 
-       <input class="film-details__emoji-item visually-hidden" name="comment-emoji" type="radio" id="emoji-angry" value="angry">
+       <input class="film-details__emoji-item visually-hidden" ${isDisabled ? 'disabled' : ''} name="comment-emoji" type="radio" id="emoji-angry" value="angry">
        <label class="film-details__emoji-label" for="emoji-angry">
          <img src="./images/emoji/angry.png" width="30" height="30" alt="emoji">
        </label>
@@ -50,8 +50,9 @@ export default class NewCommentView extends SmartView {
     super();
 
     this._data = {
-      smile: '',
-      message: '',
+      emotion: '',
+      text: '',
+      isDisabled: false,
     };
 
     this.#setInnerHandlers();
@@ -59,6 +60,14 @@ export default class NewCommentView extends SmartView {
 
   get template() {
     return createNewCommentTemplate(this._data);
+  }
+
+  get commentText() {
+    return this._data.text;
+  }
+
+  get emoji() {
+    return this._data.emotion;
   }
 
   restoreHandlers = () => {
@@ -76,14 +85,14 @@ export default class NewCommentView extends SmartView {
     evt.preventDefault();
 
     this.updateData({
-      smile: evt.target.value,
+      emotion: evt.target.value,
     });
   }
 
   #descriptionInputHandler = (evt) => {
     evt.preventDefault();
     this.updateData({
-      message: evt.target.value,
+      text: evt.target.value,
     }, true);
   }
 

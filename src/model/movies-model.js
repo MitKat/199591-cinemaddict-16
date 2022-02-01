@@ -27,39 +27,44 @@ export default class MoviesModel extends AbstractObservable {
   }
 
   updateFilm = async (updateType, update) => {
-    const index = this.#movies.findIndex((film) => film.id === update.id);
-
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting film');
-    }
+    const index = this.#findFilmIndex(update);
 
     try {
       const response = await this.#apiService.updateMovie(update);
-      const updatedFilm = this.#adaptToClient(response);
-      this.#movies = [
-        ...this.#movies.slice(0, index),
-        updatedFilm,
-        ...this.#movies.slice(index + 1),
-      ];
-      this._notify(updateType, updatedFilm);
+      this.#updateMovies(index, response, updateType);
     } catch(err) {
       throw new Error('Can\'t update film');
     }
   }
 
-  deleteComment = (updateType, update) => {
-    const index = this.#movies.findIndex((film) => film.id === update.id);
+  #findFilmIndex = (film) => {
+    const index = this.#movies.findIndex((movie) => movie.id === film.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting film');
+      throw new Error('Can\'t update unexisting film');
     }
 
+    return index;
+  }
+
+  #updateMovies = (index, update, updateType) => {
+    const updatedFilm = this.#adaptToClient(update);
     this.#movies = [
       ...this.#movies.slice(0, index),
+      updatedFilm,
       ...this.#movies.slice(index + 1),
     ];
+    this._notify(updateType, updatedFilm);
+  }
 
-    this._notify(updateType);
+  updateFilmModel = (updateType, update) => {
+    const index = this.#findFilmIndex(update);
+
+    try {
+      this.#updateMovies(index, update, updateType);
+    } catch(err) {
+      throw new Error('Can\'t update film model');
+    }
   }
 
   #adaptToClient = (movie) => {
