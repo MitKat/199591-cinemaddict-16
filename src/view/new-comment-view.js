@@ -45,7 +45,6 @@ const createNewCommentTemplate = (_data) => {
 };
 
 export default class NewCommentView extends SmartView {
-  #isDisabled = false;
 
   constructor() {
     super();

@@ -40,7 +40,6 @@ export default class CommentsPopupView extends SmartView {
   #comments = null;
   #film = null;
   #deletingCommentId = null;
-  #isDeleting = null;
 
   constructor(film, comments) {
     super();

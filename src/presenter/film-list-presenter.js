@@ -177,7 +177,7 @@ export default class FilmListPresenter {
               this.#moviesModel.updateFilmModel(UpdateType.MINOR, movieNew.movie);
             } catch(err) {
               const resetComment = () => this.#popupNewCommentComponent.updateData({isDisabled: false});
-              this.#popupNewCommentComponent.shake(resetComment);
+              this.#popupComponent.shake(resetComment);
             }
           }
         }
@@ -376,7 +376,6 @@ export default class FilmListPresenter {
     }
 
         #handleViewAction = (actionType, updateType, update) => {
-          // console.log(actionType, updateType, update);
           switch (actionType) {
             case UserAction.UPDATE_FILM:
               this.#moviesModel.updateFilm(updateType, update);
@@ -385,7 +384,6 @@ export default class FilmListPresenter {
         }
 
         #handleModelEvent = (updateType, data) => {
-          // console.log(updateType, data);
           switch (updateType) {
             case UpdateType.PATCH:
               this.#clearFilmList();
