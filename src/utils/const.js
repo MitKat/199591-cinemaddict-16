@@ -6,7 +6,6 @@ export const SortType = {
 
 export const UserAction = {
   UPDATE_FILM: 'UPDATE_FILM',
-  DELETE_COMMET: 'DELETE_COMMENT',
 };
 
 export const UpdateType = {
@@ -40,7 +39,7 @@ export const GENRE = [
   'Comedy',
 ];
 
-export const StatiscticType = {
+export const StatisticType = {
   ALL: 'All',
   TODAY: 'Today',
   WEEK: 'Week',

@@ -1,7 +1,7 @@
 import SmartView from './smart-view.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {GENRE, StatiscticType} from '../utils/const.js';
+import {GENRE, StatisticType} from '../utils/const.js';
 import {generateProfileRank} from '../utils/common.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
@@ -107,7 +107,6 @@ const renderDiagramChart = (statisticCtx, watchedMovies, dateFrom, dateTo) => {
 const createStatisticTemplate = (watchedMovies, currentType, dateFrom, dateTo) => {
   const profileName = generateProfileRank(watchedMovies.length);
   const moviesInPeriod = findMoviesInPeriod(watchedMovies, dateFrom, dateTo);
-
   let genreStat = [0];
   let topGenre = '';
   let statWatched = 0;
@@ -138,24 +137,24 @@ const createStatisticTemplate = (watchedMovies, currentType, dateFrom, dateTo) =
   <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
     <p class="statistic__filters-description">Show stats:</p>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatiscticType.ALL}"
-    ${currentType === StatiscticType.ALL ? 'checked' : ' '}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="${StatisticType.ALL}"
+    ${currentType === StatisticType.ALL ? 'checked' : ' '}>
     <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatiscticType.TODAY}"
-    ${currentType === StatiscticType.TODAY ? 'checked' : ' '}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="${StatisticType.TODAY}"
+    ${currentType === StatisticType.TODAY ? 'checked' : ' '}>
     <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatiscticType.WEEK}"
-    ${currentType === StatiscticType.WEEK ? 'checked' : ' '}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="${StatisticType.WEEK}"
+    ${currentType === StatisticType.WEEK ? 'checked' : ' '}>
     <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatiscticType.MONTH}"
-    ${currentType === StatiscticType.MONTH ? 'checked' : ' '}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="${StatisticType.MONTH}"
+    ${currentType === StatisticType.MONTH ? 'checked' : ' '}>
     <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatiscticType.YEAR}"
-    ${currentType === StatiscticType.YEAR ? 'checked' : ' '}>
+    <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="${StatisticType.YEAR}"
+    ${currentType === StatisticType.YEAR ? 'checked' : ' '}>
     <label for="statistic-year" class="statistic__filters-label">Year</label>
   </form>
 
@@ -183,11 +182,10 @@ const createStatisticTemplate = (watchedMovies, currentType, dateFrom, dateTo) =
 
 export default class StatisticView extends SmartView {
   #watchedMovies = [];
-  #currentType = StatiscticType.ALL;
+  #currentType = StatisticType.ALL;
 
   constructor(movies) {
     super();
-
     this.#watchedMovies = movies.filter((film) => film.userDetails.isAlreadyWatched);
     this._data = {
       dateFrom: dayjs().subtract(PERIOD_STAT.ALL, 'year').toDate(),
@@ -230,36 +228,36 @@ export default class StatisticView extends SmartView {
     evt.preventDefault();
     const type = evt.target.value;
 
-    if (type === StatiscticType.TODAY) {
-      this.#currentType = StatiscticType.TODAY;
+    if (type === StatisticType.TODAY) {
+      this.#currentType = StatisticType.TODAY;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ONE_DAY, 'day').toDate();
 
       this.#updateChangeTypeHandler(this._data);
     }
 
-    if (type === StatiscticType.WEEK) {
-      this.#currentType = StatiscticType.WEEK;
+    if (type === StatisticType.WEEK) {
+      this.#currentType = StatisticType.WEEK;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ONE_WEEK, 'day').toDate();
 
       this.#updateChangeTypeHandler(this._data);
     }
 
-    if (type === StatiscticType.MONTH) {
-      this.#currentType = StatiscticType.MONTH;
+    if (type === StatisticType.MONTH) {
+      this.#currentType = StatisticType.MONTH;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.MONTH, 'month').toDate();
 
       this.#updateChangeTypeHandler(this._data);
     }
 
-    if (type === StatiscticType.YEAR) {
-      this.#currentType = StatiscticType.YEAR;
+    if (type === StatisticType.YEAR) {
+      this.#currentType = StatisticType.YEAR;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.YEAR, 'year').toDate();
 
       this.#updateChangeTypeHandler(this._data);
     }
 
-    if (type === StatiscticType.ALL) {
-      this.#currentType = StatiscticType.ALL;
+    if (type === StatisticType.ALL) {
+      this.#currentType = StatisticType.ALL;
       this._data.dateFrom = dayjs().subtract(PERIOD_STAT.ALL, 'year').toDate();
       this.#updateChangeTypeHandler(this._data);
     }

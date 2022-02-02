@@ -1,5 +1,4 @@
-// import AbstractView from './abstract-view.js';
-import SmartView from './smart-view.js';
+import AbstractView from './abstract-view.js';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
@@ -68,11 +67,11 @@ const createPopupTemplate = (cardItem) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${filmInfo.writers}</td>
+              <td class="film-details__cell">${filmInfo.writers.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${filmInfo.actors}</td>
+              <td class="film-details__cell">${filmInfo.actors.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
@@ -114,7 +113,7 @@ const createPopupTemplate = (cardItem) => {
 </section>`;
 };
 
-export default class PopupView extends SmartView {
+export default class PopupView extends AbstractView {
   #cardItem = null;
 
   constructor(cardItem) {

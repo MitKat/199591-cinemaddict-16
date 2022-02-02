@@ -1,5 +1,4 @@
 import {remove, render, RenderPosition} from './utils/render.js';
-// import {generateCardFilm} from './mock/film-card.js';
 import {NavigationType, UpdateType} from './utils/const.js';
 import MainNavigationView from './view/main-navigation-view.js';
 import ProfileView from './view/profile-view.js';
@@ -54,7 +53,7 @@ const handleNavigationClick = (type) => {
   }
 };
 
-const filterPresenter = new FilterPresenter(filterContainer, filterModel, moviesModel, handleNavigationClick);
+const filterPresenter = new FilterPresenter(filterContainer, filterModel, moviesModel, screenModel, handleNavigationClick);
 
 mainNavigationComponent.setNavigationClickHandler(handleNavigationClick);
 

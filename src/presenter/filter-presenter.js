@@ -8,14 +8,16 @@ export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #moviesModel = null;
+  #screenModel = null;
   #handleNavigationClick;
 
   #filterComponent = null;
 
-  constructor(filterContainer, filterModel, moviesModel, handleNavigationClick) {
+  constructor(filterContainer, filterModel, moviesModel, screenModel, handleNavigationClick) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
     this.#moviesModel = moviesModel;
+    this.#screenModel = screenModel;
 
     this.#handleNavigationClick = handleNavigationClick;
 
@@ -70,7 +72,7 @@ export default class FilterPresenter {
   }
 
   #handleFilterTypeChange = (filterType) => {
-    if (this.#filterModel.filter === filterType) {
+    if (this.#screenModel.screen === NavigationType.FILM_LIST && this.#filterModel.filter === filterType) {
       return;
     }
     this.#handleNavigationClick(NavigationType.FILM_LIST);
