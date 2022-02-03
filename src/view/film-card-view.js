@@ -8,7 +8,6 @@ const MAX_SYMBOL=140;
 const createFilmCardTemplate = (cardItem) => {
   const {comments, filmInfo, release, userDetails} = cardItem;
 
-
   const hours = Math.floor(dayjs.duration(filmInfo.runTime, 'minutes').asHours(filmInfo.runTime));
   const minutes = dayjs.duration(filmInfo.runTime, 'minutes').minutes(filmInfo.runTime);
   const timeDuration = (hours===0) ?  `${minutes}m` : `${hours}h ${minutes}m`;

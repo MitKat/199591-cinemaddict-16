@@ -5,7 +5,7 @@ import FilmsListExtraView from '../view/films-list-extra-view';
 import ButtonShowMoreView from '../view/button-show-more-view';
 import PopupView from '../view/popup-view';
 import NewCommentView from '../view/new-comment-view';
-import CommentsPopupView from '../view/comments-view';
+import CommentsPopupView from '../view/comments-popup-view';
 import NoFilmsView from '../view/no-films-view';
 import LoadingView from '../view/loading-view';
 import FilmPresenter from './film-presenter.js';
@@ -351,8 +351,18 @@ export default class FilmListPresenter {
 
   #renderFilmsListExtra = () => {
     const isfilmRating = this.films.some((film) => film.filmInfo.totalRating);
+    const isfilmComment = this.films.some((film) => film.comments);
 
-    if (isfilmRating) {
+    let countFilmsNullRating = 0;
+    let countFilmsNoComments = 0;
+
+    this.films.forEach((film) => {
+      if (film.filmInfo.totalRating === 0) {
+        countFilmsNullRating += 1;
+      }
+    });
+
+    if (isfilmRating && countFilmsNullRating !== this.films.length) {
       const filmsCopy = this.films.slice();
       filmsCopy.sort(sortRatingFunction);
       render(this.#filmsBlockComponent, this.#filmsTopRatedComponent, RenderPosition.BEFOREEND);
@@ -360,8 +370,13 @@ export default class FilmListPresenter {
       this.#renderFilmExtra(filmsContainer, filmsCopy);
     }
 
-    const isfilmComment = this.films.some((film) => film.comments);
-    if (isfilmComment) {
+    this.films.forEach((film) => {
+      if (film.comments.length === 0) {
+        countFilmsNoComments += 1;
+      }
+    });
+
+    if (isfilmComment && countFilmsNoComments !== this.films.length) {
       const filmsCopy = this.films.slice();
       filmsCopy.sort(sortCommentLengthFunction);
       render(this.#filmsBlockComponent, this.#filmsMostCommentedComponent, RenderPosition.BEFOREEND);

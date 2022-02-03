@@ -24,9 +24,8 @@ export default class ApiService {
       url: `comments/${movieId}`,
       method: Method.GET,
     });
-    const parsedResponse = await ApiService.parseResponse(response);
 
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   }
 
   updateMovie = async (movie) => {
@@ -37,9 +36,7 @@ export default class ApiService {
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   }
 
   addComment = async (movie, comment) => {
@@ -50,19 +47,13 @@ export default class ApiService {
       headers: new Headers({'Content-Type': 'application/json'}),
     });
 
-    const parsedResponse = await ApiService.parseResponse(response);
-
-    return parsedResponse;
+    return await ApiService.parseResponse(response);
   }
 
-  deleteComment = async (commentId) => {
-    const response = await this.#load({
-      url: `comments/${commentId}`,
-      method: Method.DELETE,
-    });
-
-    return response;
-  }
+  deleteComment = async (commentId) => await this.#load({
+    url: `comments/${commentId}`,
+    method: Method.DELETE,
+  })
 
   #load = async ({
     url,

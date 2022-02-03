@@ -19,7 +19,7 @@ const PERIOD_STAT = {
   YEAR: 1,
 };
 
-const findGenreStatisic = (movies) => {
+const findGenreStatistic = (movies) => {
   const findGenre = (film, genre) => film.filmInfo.genre.find((filmGenre) => filmGenre === genre);
   const genreStat = GENRE.map((genre) => movies.filter((film) => findGenre(film, genre) === genre).length);
 
@@ -43,7 +43,7 @@ const findMoviesInPeriod = (watchedMovies, dateFrom, dateTo) => {
 const renderDiagramChart = (statisticCtx, watchedMovies, dateFrom, dateTo) => {
   statisticCtx.height = BAR_HEIGHT * GENRE.length;
   const moviesInPeriod = findMoviesInPeriod(watchedMovies, dateFrom, dateTo);
-  const genreStat = findGenreStatisic(moviesInPeriod);
+  const genreStat = findGenreStatistic(moviesInPeriod);
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
@@ -114,7 +114,7 @@ const createStatisticTemplate = (watchedMovies, currentType, dateFrom, dateTo) =
   let minutes = 0;
 
   if (moviesInPeriod.length !== 0) {
-    genreStat = findGenreStatisic(moviesInPeriod);
+    genreStat = findGenreStatistic(moviesInPeriod);
     topGenre = findTopGenre(genreStat);
     statWatched = moviesInPeriod.length;
 
